@@ -1,0 +1,63 @@
+
+
+// Bootstrap
+
+@import "../node_modules/bootstrap/scss/functions";
+
+$primary: #01017a;
+
+@import "../node_modules/bootstrap/scss/bootstrap";
+
+// Toast 
+
+@import "vue-toastification/dist/index.css";
+
+// Vue mutliselect
+
+@import "vue-multiselect/dist/vue-multiselect.css";
+
+// custom 
+
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 200;
+  src: url('../assets/MaterialIconsOutlined-Regular.otf');
+}
+
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;  /* Preferred icon size */
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'liga';
+}
+
+.nav-link > .material-icons {
+  font-size: 30px;
+}
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  padding: $spacer * 0.5;
+  &:hover {
+    background: #fff;
+    border-radius: 100%;
+  }
+}
+
+.table > tbody > tr > td {
+  padding: 0;
+  vertical-align: middle;
+}

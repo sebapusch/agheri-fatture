@@ -1,7 +1,10 @@
 import {app, BrowserWindow, ipcMain, session} from 'electron';
 import {join} from 'path';
+import registerSequelize from './sequelize';
+import registerControllers from './controller';
 
 function createWindow () {
+  
   const mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
@@ -20,8 +23,15 @@ function createWindow () {
     mainWindow.loadFile(join(app.getAppPath(), 'renderer', 'index.html'));
   }
 }
+ 
+app.whenReady()
+  .then(() => run())
+  .catch((error) => console.log(error));
 
-app.whenReady().then(() => {
+async function run() {
+  const sequelize = await registerSequelize();
+  
+  registerControllers(sequelize);
   createWindow();
 
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
@@ -40,12 +50,8 @@ app.whenReady().then(() => {
       createWindow();
     }
   });
-});
+}
 
 app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit()
 });
-
-ipcMain.on('message', (event, message) => {
-  console.log(message);
-})

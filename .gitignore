@@ -1,6 +1,7 @@
 node_modules
 dist
 build
-
+electron-vue-template-darwin-arm64
+electron*
 .vscode
 .idea

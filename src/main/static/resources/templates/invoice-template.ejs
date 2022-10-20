@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  
+  <head>
+
+    <style>
+      @font-face {
+          font-family: Roboto;
+          src:url("../fonts/Roboto_Mono/static/RobotoMono-Regular.ttf");
+      }
+      <%- style %>
+
+    </style>
+
+  </head>
+  <body>
+    <div class="profile">
+      <%= profile.name %><br>
+      <%= profile.title %><br>
+      <% profile.address.forEach(line => { %>
+        <%= line %><br>
+      <% }) %>
+      <%= profile.piva %>   
+    </div>
+
+    <div id="invoice-details">
+      <div id="billing">
+        <%= profile.billing.name %><br>
+        <%= profile.billing.bank %><br>
+        <%= profile.billing.iban %><br>
+        <%= profile.billing.bic %><br>
+      </div>
+
+      <div id="client">
+        <% if (client) { %>
+          
+          <%= client.holder %><br>
+          <%= client.name  %><br>
+          <%= client.address %><br>
+          <%= client.zipcode %><br>
+          <%= client.piva %><br>
+        <% } %> 
+      </div>
+    </div>
+
+    <div id="service-container">
+      <table id="service-table">
+        <thead>
+          <tr>
+            <th>Servizio</th>
+            <th>Quantità</th>
+            <th>Prezzo</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% services.forEach(service => { %>
+  
+            <tr>
+              <td><%= service.name %></td>
+              <td><%= service.quantity %></td>
+              <td><%= service.price %></td>
+              <td><%= price(service.totalAmount) %></td>
+            </tr>
+  
+          <% }) %>
+            <tr style="border: 0">
+              <td style="border: 0"></td>
+              <td style="border: 0"></td>
+              <td>Summe</td>
+              <td><%= price(totalAmount) %></td>
+            </tr>
+          <% if (chf && displayEuro) { %>
+            <tr style="border: 0">
+              <td style="border: 0"></td>
+              <td style="border: 0"></td>
+              <td style="border: 0"></td>
+              <td>€ <%= totalAmount * exchangeRate %></td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+    
+  </body>
+
+</html>
