@@ -5,21 +5,25 @@ import path from 'path';
 import { readFileSync } from 'fs';
 import { generatePdf } from 'html-pdf-node';
 import { createWriteStream } from 'original-fs';
+import {$toRef} from "vue/macros";
 
-type Invoice = {
+type SavableInvoice = {
   nation: string,
+  totalAmount: number,
+  date: Date,
+  code: string,
   client: {
-    name: string|null,
-    holder: string|null,
-    piva: string|null,
-    zipcode: string|null,
+    name: string,
+    holder: string,
+    piva: string,
+    zipcode: string,
   },
   services: Array<{
     type: string,
     name: string,
-    quantity: number|null,
-    price: number|null,
-  }>
+    quantity: number,
+    price: number,
+  }>,
 }
 
 type Profile = {
@@ -40,11 +44,11 @@ const resourcePath = join(__dirname, '../../static/resources')
 const templatePath = join(resourcePath, 'templates/invoice-template.ejs');
 const templateStylePath = join(resourcePath, 'template_styles/template-style.css');
 const profilePath = join(resourcePath, 'profile.json');
-const logo = path.resolve(join(resourcePath, 'images/logo.png'));
+//const logo = path.resolve(join(resourcePath, 'images/logo.png'));
 
 export default class InvoicePDF {
 
-  private profile: Profile;
+  private readonly profile: Profile;
 
   public constructor() {
     this.profile = JSON.parse(readFileSync(profilePath).toString());
@@ -54,7 +58,7 @@ export default class InvoicePDF {
     return readFile(templateStylePath);
   }
 
-  public async save(invoice: any, target: string): Promise<boolean>
+  public async save(invoice: SavableInvoice, target: string): Promise<boolean>
   {
     const file = {
       content: await this.render(invoice),
@@ -62,7 +66,7 @@ export default class InvoicePDF {
 
     const options = {
       format: 'A4',
-      localUrlAccess: true
+      localUrlAccess: true,
     }
 
     const pdf: Buffer = await generatePdf(file, options);
@@ -73,26 +77,17 @@ export default class InvoicePDF {
   public async render(invoice: any): Promise<string> {
 
     const style = (await this.style()).toString();
+    const currency = this.getInvoiceCurrency(invoice.nation);
+    const helpers = {
+      price: (amount: number) => `${currency} ${amount}`,
+    };
 
     return new Promise((resolve, reject) => {
 
-      const currency = 
-        invoice.nation === 'CH' 
-          ? 'CHF' 
-          : invoice.nation === 'DE' 
-            ? '€' 
-            : '?';
-
-      const price = (amount: number) => `${currency} ${amount}`;
-
-
-      console.log(path.normalize('file://' + path.resolve(join(resourcePath)) + '/images/test.png'));
       const data = {
-        ...invoice,
-        chf: invoice.nation === 'CH',
+        invoice,
+        helpers,
         currency,
-        path: 'file://' + path.resolve(join(resourcePath)) + '/images/test.png',
-        price,
         profile: this.profile,
         style,
       };
@@ -108,4 +103,12 @@ export default class InvoicePDF {
     });
   }
 
+  private getInvoiceCurrency(nation: string|null): string {
+    switch (nation) {
+      case 'CH': return 'CHF';
+      case 'DE': return '€';
+    }
+
+    return '?';
+  }
 }

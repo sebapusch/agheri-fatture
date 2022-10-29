@@ -12,6 +12,11 @@ type ListOptions = {
   }
 };
 
+type ListResponse = {
+  total: number,
+  data: Array<object>
+};
+
 type Response = {
   channel: string,
   success: boolean,
@@ -25,10 +30,10 @@ abstract class Controller {
   protected searchable: Array<string>;
   protected defaultOrder = ['createdAt', 'DESC'];
 
-  constructor(sequelize: Sequelize, modelName: string, searcheable: Array<string> = []) {
+  protected constructor(sequelize: Sequelize, modelName: string, searchable: Array<string> = []) {
     this.sequelize = sequelize;
     this.modelName = modelName;
-    this.searchable = searcheable;
+    this.searchable = searchable;
     this.register();
   };
 
@@ -36,14 +41,22 @@ abstract class Controller {
     return this.sequelize.models[this.modelName];
   }
 
-  protected register() {
+  protected register(except: Array<string> = []) {
+    const handlerMap = {
+      'store': async (values) => this.store(values),
+      'list': async (options) => this.list(options),
+      'delete': async (id: string) => this.delete(id),
+      'update': async (id: string, values) => this.update(id, values),
+      'find': async (id) => this.find(id),
+    }
 
-    this.handle('store', async (values) => this.store(values));
-    this.handle('list', async (options) => this.list(options));
-    this.handle('delete', async (id) => this.delete(id));
-    this.handle('update', async (id, values) => this.update(id, values))
-    this.handle('find', async (id) => this.find(id));
+    for (const event in handlerMap) {
+      if (except.includes(event)) {
+        continue;
+      }
 
+      this.handle(event, handlerMap[event]);
+    }
   }
 
   protected handle(event: string, handler: Function) {
@@ -63,7 +76,7 @@ abstract class Controller {
 
         console.log(response.content);
 
-        this.responde(event.sender, response);
+        this.respond(event.sender, response);
 
       } catch (error) {
 
@@ -71,26 +84,32 @@ abstract class Controller {
 
         response.content = error;
         response.success = false;
-        this.responde(event.sender, response);
+        this.respond(event.sender, response);
       }
     });
 
   }
 
-  private responde(sender: WebContents, response: Response)
+  private respond(sender: WebContents, response: Response)
   {
     sender.send(response.channel, response);
   }
 
   protected async find(id: string) {
-    return (await this.model().findByPk(id))?.get({ plain: true });
+    const model = await this.model().findByPk(id);
+
+    if (typeof model === null) {
+      throw new Error('Nessun elemento trovato corrispondente alla chiave passata');
+    }
+
+    return model!.get({ plain: true });
   }
 
   protected async store(values) {
     return await this.model().create(values);
   }
 
-  protected async delete(id: string) {
+  protected async delete(id: string): Promise<number> {
     return await this.model().destroy({
       where: {
         id: id
@@ -98,15 +117,15 @@ abstract class Controller {
     });
   }
 
-  private async update(id: string, values) {
-    return await this.model().update(values, {
-      where: {
-        id,
-      }
-    });
+  protected async update(id: string, values): Promise<boolean> {
+    const options = { where: { id } };
+    const [updated] = await this.model()
+        .update(values, options);
+
+    return updated > 0;
   }
 
-  protected async list(options: ListOptions) {
+  protected async list(options: ListOptions): Promise<ListResponse> {
 
     const listOptions = this.buildListOptions(options);
 
@@ -167,4 +186,4 @@ abstract class Controller {
   }
 }
 
-export { Controller, ListOptions };
+export { Controller, ListOptions, ListResponse };

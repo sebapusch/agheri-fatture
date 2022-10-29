@@ -5,5 +5,5 @@ export default class UserController extends Controller {
   
   constructor(sequelize: Sequelize) {
     super(sequelize, 'client', ['name', 'holder']);
-  } 
+  }
 }

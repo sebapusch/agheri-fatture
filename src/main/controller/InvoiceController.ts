@@ -1,14 +1,12 @@
 import InvoicePDF from '../invoice/pdf/Invoice';
 import { Sequelize } from 'sequelize';
-import {Controller, ListOptions} from './Controller';
-import { generatePdf } from 'html-pdf-node';
-import { createWriteStream } from 'original-fs';
+import { Controller, ListOptions, ListResponse } from './Controller';
 import { ServiceTypes } from '../sequelize/models/Service';
 import { Nations } from '../sequelize/models/Invoice';
 import request from 'request';
 import { dialog, shell } from 'electron';
 
-const exchangeRateUri = 'https://api.exchangerate.host/latest?base=EUR&symbols=CHF';
+const exchangeRateUri = 'https://api.exchangerate.host/latest?base=CHF&symbols=EUR';
 const serviceTypes = [...Object.values(ServiceTypes)] as const;
 
 type Service = {
@@ -31,17 +29,17 @@ export default class InvoiceController extends Controller {
 
   protected register()
   {
-    super.register();
+    super.register(['update']);
     this.handle('preview', this.preview);
     this.handle('save', async (id: string) => this.save(id));
     this.handle('previewFromId', async (id: string) => this.previewFromId(id));
     this.handle('exchangeRate', this.getChfExchangeRage);
   }
 
-  private async previewFromId(id: string) {
+  private async previewFromId(id: string): Promise<string> {
     const pdf = new InvoicePDF();
     const invoice = await this.find(id);
-
+    
     return await pdf.render(invoice);
   }
 
@@ -51,7 +49,7 @@ export default class InvoiceController extends Controller {
     return await pdf.render(invoice);
   }
 
-  protected async getChfExchangeRage()
+  protected async getChfExchangeRage(): Promise<number>
   {
     return new Promise((resolve, reject) => {
 
@@ -59,7 +57,7 @@ export default class InvoiceController extends Controller {
         if (err) {
           reject(err);
         } else {
-          resolve(body.rates.CHF.toFixed(2));
+          resolve(body.rates.EUR.toFixed(2));
         }
       });
     });
@@ -78,7 +76,7 @@ export default class InvoiceController extends Controller {
     return created.get();
   }
 
-  protected async list(options: ListOptions) {
+  protected async list(options: ListOptions): Promise<ListResponse> {
     
     const listOptions = this.buildListOptions(options);
 
@@ -92,7 +90,7 @@ export default class InvoiceController extends Controller {
     }
   }
 
-  protected async delete(id: string) {
+  protected async delete(id: string): Promise<number> {
     const { invoice } = this.sequelize.models;
 
     const options = { 
@@ -100,7 +98,7 @@ export default class InvoiceController extends Controller {
       cascade: true,
     };
 
-    invoice.destroy({ cascade})
+    return await invoice.destroy(options);
   }
 
   protected async find(id: string) {
@@ -160,5 +158,7 @@ export default class InvoiceController extends Controller {
     await pdf.save(invoice, path);
 
     shell.openPath(path);
+
+    return;
   }
 }
