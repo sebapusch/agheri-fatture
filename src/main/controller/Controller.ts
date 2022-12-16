@@ -81,6 +81,8 @@ abstract class Controller {
 
       } catch (error) {
 
+        console.log(error);
+
         response.content = error;
         response.success = false;
         this.respond(event.sender, response);
@@ -92,7 +94,7 @@ abstract class Controller {
   private validateSender(frame: WebFrameMain) {
     const senderUrl = new URL(frame.url);
 
-    if (senderUrl.host !== 'electronjs.org') {
+    if (false === ['electronjs.org', 'localhost:8080'].includes(senderUrl.host)) {
       throw new Error('Errore di sicurezza');
     }
   }

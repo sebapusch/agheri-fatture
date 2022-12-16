@@ -1,15 +1,27 @@
 import { join } from 'path';
 import ejs from 'ejs';
 import { readFile } from 'fs/promises';
-import path from 'path';
+import { Nations } from '../../sequelize/models/Invoice';
 import { readFileSync } from 'fs';
 import { generatePdf } from 'html-pdf-node';
 import { createWriteStream } from 'original-fs';
+import { ServiceTypes } from '../../sequelize/models/Service';
 
-type SavableInvoice = {
-  nation: string,
-  totalAmount: number,
-  date: Date,
+enum Currency {
+  EUR = '€',
+  CHF = 'chf',
+};
+
+type RenderOptions = {
+  currency: Currency,
+  displayEur: boolean,
+  exchangeRate: number,
+};
+
+type RenderableInvoice = {
+  totalAmount: string,
+  totalAmountEur: string|null,
+  date: string,
   code: string,
   client: {
     name: string,
@@ -20,8 +32,10 @@ type SavableInvoice = {
   services: Array<{
     type: string,
     name: string,
-    quantity: number,
-    price: number,
+    quantity: number|string,
+    price: string,
+    priceNum: number,
+    totalAmount: number
   }>,
 }
 
@@ -48,19 +62,23 @@ const profilePath = join(resourcePath, 'profile.json');
 export default class InvoicePDF {
 
   private readonly profile: Profile;
+  private renderOptions: RenderOptions;
+  private invoice: RenderableInvoice;
 
-  public constructor() {
+  public constructor(data: any) {
     this.profile = JSON.parse(readFileSync(profilePath).toString());
+    this.renderOptions = this.setOptions(data);
+    this.invoice = this.setInvoice(data);
   }
 
   private async style() {
     return readFile(templateStylePath);
   }
 
-  public async save(invoice: SavableInvoice, target: string): Promise<boolean>
+  public async save(target: string): Promise<boolean>
   {
     const file = {
-      content: await this.render(invoice),
+      content: await this.render(),
     }
 
     const options = {
@@ -73,21 +91,21 @@ export default class InvoicePDF {
     return createWriteStream(target).write(pdf);
   }
   
-  public async render(invoice: any): Promise<string> {
+  public async render(): Promise<string> {
 
     const style = (await this.style()).toString();
-    const currency = this.getInvoiceCurrency(invoice.nation);
-    const helpers = {
-      price: (amount: number) => `${currency} ${amount}`,
-    };
 
     return new Promise((resolve, reject) => {
 
       const data = {
-        invoice,
-        helpers,
-        currency,
         profile: this.profile,
+        client: this.invoice.client,
+        services: this.invoice.services,
+        options: this.renderOptions,
+        invoice: {
+          totalAmount: this.invoice.totalAmount,
+          totalAmountEur: this.invoice.totalAmountEur,
+        },
         style,
       };
 
@@ -102,12 +120,99 @@ export default class InvoicePDF {
     });
   }
 
-  private getInvoiceCurrency(nation: string|null): string {
-    switch (nation) {
-      case 'CH': return 'CHF';
-      case 'DE': return '€';
+  private setOptions(data: any): RenderOptions {
+    const renderOptions = {
+      currency: Currency.EUR,
+      displayEur: false,
+      exchangeRate: 0,
     }
 
-    return '?';
+    if (data.nation && data.nation === Nations.CH) {
+      renderOptions.currency = Currency.CHF;
+      renderOptions.displayEur = data.displayEuro ?? false;
+      
+      if (renderOptions.displayEur) {
+
+        renderOptions.exchangeRate = typeof data.exchangeRate === 'number'
+          ? data.exchangeRate
+          : 1;
+      }
+    }
+
+    return renderOptions;
+  }
+
+  private setInvoice(data: any): RenderableInvoice {
+    const invoice: any = {};
+
+    if (data.date instanceof Date) {
+      invoice.date = data.date.toString();
+    } else {
+      invoice.date = (new Date).toString();
+    }
+
+    invoice.client = {
+      holder: data.client?.holder ?? '-',
+      name: data.client?.name ?? '-',
+      address: data.client?.address ?? '-',
+      zipcode: data.client?.zipcode ?? '-',
+      piva: data.client?.piva ?? '-',
+    };
+
+    invoice.services = [];
+
+    if (data.services && Array.isArray(data.services)) {
+
+      invoice.services = data.services.map((service) => ({
+        name: service.name ?? '-',
+        quantity: service.quantity ?? '-',
+        price: this.currencyPrice(service.price ?? 0),
+        priceNum: service.price ?? 0,
+        totalAmount: this.prepareServiceTotalAmount(service),
+        // todo type?
+      }));
+    }
+
+    let totalAmount = 0;
+
+    if (typeof (data.totalAmount ?? null) === 'number') {
+      totalAmount = data.totalAmount;
+    }
+
+    if (this.renderOptions.displayEur) {
+      invoice.totalAmountEur = this.currencyPrice(totalAmount, true);
+    }
+
+    invoice.totalAmount = this.currencyPrice(totalAmount);
+
+    return invoice;
+  }
+
+  private prepareServiceTotalAmount(service: any): string {
+    if (!service || service.price) {
+      
+      return this.currencyPrice(0);
+    }
+
+    if (
+      !service.quantity || 
+      !service.type || 
+      [ServiceTypes.FLAT, ServiceTypes.MIN].includes(service.type)
+    ) {
+      return this.currencyPrice(service.price);
+    }
+
+    return this.currencyPrice(service.price * service.quantity);
+  }
+
+  private currencyPrice(price: number, convert: boolean = false): string {
+    let currency = this.renderOptions.currency;
+
+    if (convert) {
+      price = price * this.renderOptions.exchangeRate;
+      currency = Currency.EUR
+    }
+
+    return `${currency} ${price}`;
   }
 }

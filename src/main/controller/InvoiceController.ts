@@ -36,17 +36,18 @@ export default class InvoiceController extends Controller {
     this.handle('exchangeRate', this.getChfExchangeRage);
   }
 
-  private async previewFromId(id: string): Promise<string> {
-    const pdf = new InvoicePDF();
-    const invoice = await this.find(id);
-    
-    return await pdf.render(invoice);
+  private async preview(invoice: any) {
+    const pdf = new InvoicePDF(invoice);
+
+    return await pdf.render();
   }
 
-  private async preview(invoice: any) {
-    const pdf = new InvoicePDF();
+  private async previewFromId(id: string): Promise<string> {
+    const invoice = await this.find(id);
 
-    return await pdf.render(invoice);
+    const pdf = new InvoicePDF(invoice);
+    
+    return await pdf.render();
   }
 
   protected async getChfExchangeRage(): Promise<number>
@@ -57,7 +58,7 @@ export default class InvoiceController extends Controller {
         if (err) {
           reject(err);
         } else {
-          resolve(body.rates.EUR.toFixed(2));
+          resolve(body.rates.EUR.toFixed(2) ?? null);
         }
       });
     });
@@ -84,8 +85,10 @@ export default class InvoiceController extends Controller {
     
     const { invoice } = this.sequelize.models;
 
+    const data = await invoice.findAll(listOptions);
+
     return {
-      data: (await invoice.findAll(listOptions)).map(row => row.get({plain: true})),
+      data: data.map(row => row.get({plain: true})),
       total: await invoice.count(listOptions),
     }
   }
@@ -152,10 +155,10 @@ export default class InvoiceController extends Controller {
       return;
     }
 
-    const pdf = new InvoicePDF();
+    const pdf = new InvoicePDF(invoice);
     const path = `${filePath}.pdf`;
     
-    await pdf.save(invoice, path);
+    await pdf.save(path);
 
     shell.openPath(path);
 

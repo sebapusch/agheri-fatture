@@ -32,14 +32,11 @@
       </div>
 
       <div id="client">
-        <% if (invoice.client) { %>
-          
-          <%= invoice.client.holder %><br>
-          <%= invoice.client.name  %><br>
-          <%= invoice.client.address %><br>
-          <%= invoice.client.zipcode %><br>
-          <%= invoice.client.piva %><br>
-        <% } %> 
+        <%= client.holder %><br>
+        <%= client.name  %><br>
+        <%= client.address %><br>
+        <%= client.zipcode %><br>
+        <%= client.piva %><br>
       </div>
     </div>
 
@@ -54,13 +51,13 @@
           </tr>
         </thead>
         <tbody>
-          <% invoice.services.forEach(service => { %>
+          <% services.forEach(({ name, quantity, price, totalAmount }) => { %>
   
             <tr>
-              <td><%= service.name %></td>
-              <td><%= service.quantity %></td>
-              <td><%= service.price %></td>
-              <td><%= helpers.price(service.totalAmount) %></td>
+              <td><%= name %></td>
+              <td><%= quantity %></td>
+              <td><%= price %></td>
+              <td><%= totalAmount %></td>
             </tr>
   
           <% }) %>
@@ -68,14 +65,14 @@
               <td style="border: 0"></td>
               <td style="border: 0"></td>
               <td>Summe</td>
-              <td><%= helpers.price(totalAmount) %></td>
+              <td><%= invoice.totalAmount %></td>
             </tr>
-          <% if (chf && displayEuro) { %>
+          <% if (options.displayEur) { %>
             <tr style="border: 0">
               <td style="border: 0"></td>
               <td style="border: 0"></td>
               <td style="border: 0"></td>
-              <td>€ <%= totalAmount * exchangeRate %></td>
+              <td><%= invoice.totalAmountEur %></td>
             </tr>
           <% } %>
         </tbody>
