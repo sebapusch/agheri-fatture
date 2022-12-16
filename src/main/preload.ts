@@ -68,8 +68,6 @@ class Bridge {
     });
 
     contextBridge.exposeInMainWorld('bridge', api);
-
-    console.log(api);
   }
 
   private renderFunctionName = (model: string, action: string) => `${action}${this.ucfirst(model)}`;

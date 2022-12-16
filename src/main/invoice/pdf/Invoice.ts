@@ -5,7 +5,6 @@ import path from 'path';
 import { readFileSync } from 'fs';
 import { generatePdf } from 'html-pdf-node';
 import { createWriteStream } from 'original-fs';
-import {$toRef} from "vue/macros";
 
 type SavableInvoice = {
   nation: string,

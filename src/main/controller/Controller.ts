@@ -1,4 +1,4 @@
-import { ipcMain, WebContents } from 'electron';
+import { ipcMain, WebContents, IpcMainEvent, WebFrameMain } from 'electron';
 import { Sequelize, Op, FindOptions } from 'sequelize';
 
 type ListOptions = {
@@ -69,18 +69,17 @@ abstract class Controller {
       channel: eventName,
     }
 
-    ipcMain.on(eventName, async (event, ...args) => {
+    ipcMain.on(eventName, async (event: IpcMainEvent, ...args) => {
       try {
+
+        this.validateSender(event.senderFrame);
+
         response.content = await handler(...args);
         response.success = true;
-
-        console.log(response.content);
 
         this.respond(event.sender, response);
 
       } catch (error) {
-
-        console.log(error);
 
         response.content = error;
         response.success = false;
@@ -88,6 +87,14 @@ abstract class Controller {
       }
     });
 
+  }
+
+  private validateSender(frame: WebFrameMain) {
+    const senderUrl = new URL(frame.url);
+
+    if (senderUrl.host !== 'electronjs.org') {
+      throw new Error('Errore di sicurezza');
+    }
   }
 
   private respond(sender: WebContents, response: Response)
