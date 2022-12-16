@@ -1,26 +1,33 @@
+html {
+  -webkit-print-color-adjust: exact;
+}
+
 body {
   font-family: Verdana, Geneva, Tahoma, sans-serif;
   font-size: small;
 }
 
-#service-container {
-  margin-top: 100px;
-  width: 100%;
+h3 {
+  margin: 0;
 }
 
-#invoice-details {
-  width: 100%;
+.row {
+  display: flex;
 }
 
-#billing, #client {
+.col {
   display: inline-block;
   width: 44%;
   margin: 0;
   padding: 20px;
 }
 
+#service-container {
+  margin-top: 20px;
+  padding: 20px;
+}
 #service-table {
-  width: 80%;
+  width: -webkit-fill-available;
   margin: auto;
   border-collapse: collapse;
 }
@@ -30,5 +37,18 @@ body {
 }
 
 #service-table tr:nth-child(even) {
-  background-color: #f2f2f2;
+  background-color: #f2f2f2 !important
+}
+
+.no-border {
+  border: 0 !important;
+}
+
+.no-border-row>td {
+  border: 0 !important;
+  ;
+}
+
+.force-border {
+  border: 1px solid #000;
 }

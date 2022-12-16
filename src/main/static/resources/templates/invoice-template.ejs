@@ -9,35 +9,27 @@
           src:url("../fonts/Roboto_Mono/static/RobotoMono-Regular.ttf");
       }
       <%- style %>
-
     </style>
 
   </head>
   <body>
-    <div class="profile">
-      <%= profile.name %><br>
-      <%= profile.title %><br>
-      <% profile.address.forEach(line => { %>
-        <%= line %><br>
-      <% }) %>
-      <%= profile.piva %>   
-    </div>
+    <div class="row">
 
-    <div id="invoice-details">
-      <div id="billing">
-        <%= profile.billing.name %><br>
-        <%= profile.billing.bank %><br>
-        <%= profile.billing.iban %><br>
-        <%= profile.billing.bic %><br>
+      <div id="profile" class="col">
+        <h3><%= profile.name %></h3>
+        <h3><%= profile.title %></h3>
+        <br><br>
+        <% profile.address.forEach(line => { %>
+          <%= line %><br>
+        <% }) %>
+        <%= profile.piva %>   
       </div>
 
-      <div id="client">
-        <%= client.holder %><br>
-        <%= client.name  %><br>
-        <%= client.address %><br>
-        <%= client.zipcode %><br>
-        <%= client.piva %><br>
+      <div class="col">
+        <b>Invoice number: </b> <%= invoice.code %><br> 
+        <b>Date: </b> <%= invoice.date %><br> 
       </div>
+
     </div>
 
     <div id="service-container">
@@ -61,22 +53,39 @@
             </tr>
   
           <% }) %>
-            <tr style="border: 0">
-              <td style="border: 0"></td>
-              <td style="border: 0"></td>
+            <tr class="no-border-row">
+              <td></td>
+              <td></td>
               <td>Summe</td>
               <td><%= invoice.totalAmount %></td>
             </tr>
           <% if (options.displayEur) { %>
-            <tr style="border: 0">
-              <td style="border: 0"></td>
-              <td style="border: 0"></td>
-              <td style="border: 0"></td>
+            <tr class="no-border-row">
+              <td></td>
+              <td></td>
+              <td></td>
               <td><%= invoice.totalAmountEur %></td>
             </tr>
           <% } %>
         </tbody>
       </table>
+    </div>
+
+    <div class="row" id="invoice-details">
+      <div class="col">
+        <%= profile.billing.name %><br>
+        <%= profile.billing.bank %><br>
+        <%= profile.billing.iban %><br>
+        <%= profile.billing.bic %><br>
+      </div>
+
+      <div class="col">
+        <%= client.holder %><br>
+        <%= client.name  %><br>
+        <%= client.address %><br>
+        <%= client.zipcode %><br>
+        <%= client.piva %><br>
+      </div>
     </div>
     
   </body>

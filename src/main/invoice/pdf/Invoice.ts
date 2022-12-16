@@ -105,6 +105,8 @@ export default class InvoicePDF {
         invoice: {
           totalAmount: this.invoice.totalAmount,
           totalAmountEur: this.invoice.totalAmountEur,
+          date: this.invoice.date,
+          code: this.invoice.code,
         },
         style,
       };
@@ -146,10 +148,12 @@ export default class InvoicePDF {
     const invoice: any = {};
 
     if (data.date instanceof Date) {
-      invoice.date = data.date.toString();
+      invoice.date = data.date.toLocaleDateString('it-IT');
     } else {
-      invoice.date = (new Date).toString();
+      invoice.date = (new Date).toLocaleDateString('it-IT');
     }
+
+    invoice.code = data.code ?? '-'
 
     invoice.client = {
       holder: data.client?.holder ?? '-',
