@@ -47,7 +47,7 @@ abstract class Controller {
       'list': async (options) => this.list(options),
       'delete': async (id: string) => this.delete(id),
       'update': async (id: string, values) => this.update(id, values),
-      'find': async (id) => this.find(id),
+      'find': async (id: string) => this.find(id),
     }
 
     for (const event in handlerMap) {

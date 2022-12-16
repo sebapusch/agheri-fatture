@@ -35,6 +35,24 @@
     </DataTable>
   </div>
 
+  <Modal 
+    modalId="confirm-invoice-delete" 
+    ref="deleteModal"
+    :header="false"
+  >
+    <template v-slot:body>
+      <div class="text-center w-100 py-2">
+        Confermi l'eliminazione della fattura {{ deleteInvoice?.code }}?
+      </div>
+    </template>
+
+    <template v-slot:footer>
+      <button class="btn btn-light" @click="handleDeleteCancel">Annulla</button>
+      <button class="btn btn-danger" @click="handleDeleteConfirm">Conferma</button>
+    </template>
+  </Modal>
+
+
   <div>
       <InvoicePreview
         ref="preview"
@@ -51,6 +69,7 @@ import InvoicePreview from '../invoice/Preview.vue';
 import { invoice as invoiceApi } from '../../api';
 import { useToast } from 'vue-toastification';
 import { Tooltip } from 'bootstrap';
+import Modal from '../Modal.vue';
 
 const tableDefinition = [{
     name: 'code',
@@ -73,7 +92,7 @@ const tableDefinition = [{
 export default {
 
   name: 'InvoiceListPage',
-  components: { DataTable, InvoicePreview },
+  components: { DataTable, InvoicePreview, Modal },
 
   setup() {
     return { toast: useToast() };
@@ -83,6 +102,7 @@ export default {
     return {
       invoices: [],
       invoicePreview: null,
+      deleteInvoice: null,
       tableDefinition,
       actions: ["delete", "search"],
       table: {
@@ -170,13 +190,25 @@ export default {
       this.$parent.selectPage('invoiceAdd', { initialInvoice });
     },
 
-    async handleDelete(id) {
+    handleDelete(deleteId) {
+      this.deleteInvoice = this.invoices.find(({ id }) => id === deleteId);
+      this.$refs.deleteModal.show();
+    },
+
+    handleDeleteCancel() {
+      this.$refs.deleteModal.hide();
+      this.deleteInvoice = null;
+    },
+
+    async handleDeleteConfirm() {
       try {
-        await invoiceApi.delete(id);
+        await invoiceApi.delete(this.deleteInvoice.id);
+        this.list();
         this.toast.success('Fattura eliminata con successo');
       } catch (e) {
         this.toast.error(e.message);
       }
+      this.$refs.deleteModal.hide();
     },
 
     async handlePreview(id) {

@@ -29,11 +29,12 @@ export default class InvoiceController extends Controller {
 
   protected register()
   {
-    super.register(['update']);
+    super.register(['update', 'delete']);
     this.handle('preview', this.preview);
     this.handle('save', async (id: string) => this.save(id));
     this.handle('previewFromId', async (id: string) => this.previewFromId(id));
     this.handle('exchangeRate', this.getChfExchangeRage);
+    this.handle('delete', (id: string) => this.delete(id));
   }
 
   private async preview(invoice: any) {
@@ -94,14 +95,11 @@ export default class InvoiceController extends Controller {
   }
 
   protected async delete(id: string): Promise<number> {
-    const { invoice } = this.sequelize.models;
+    const { invoice, service } = this.sequelize.models;
 
-    const options = { 
-      where: { id },
-      cascade: true,
-    };
-
-    return await invoice.destroy(options);
+    await service.destroy({ where: { invoiceId: id }});
+    
+    return await invoice.destroy({ where: { id }});
   }
 
   protected async find(id: string) {
