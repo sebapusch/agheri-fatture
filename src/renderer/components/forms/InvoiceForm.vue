@@ -350,15 +350,23 @@ export default {
   },
 
   watch: {
+    clientNation: {
+      handler(nation, old) {
+        if (nation && nation !== old) {
+          this.form.nation = nation;
+        }
+      },
+    },
     form: {
       deep: true,
-      handler(value) {
+      handler(value, old) {
 
         const invoice = JSON.parse(JSON.stringify(value));
 
         if (value.clientId) {
           invoice.clientId = value.clientId.id;
         }
+
         this.$emit('update:modelValue', invoice);
       },
     },
@@ -367,7 +375,7 @@ export default {
   methods: {
     async handleClientSearch(term) {
       const clients = await clientApi.list({
-        attributes: ['id', 'name'],
+        attributes: ['id', 'name', 'state'],
         limit: 10,
         offset: 0,
         query: term,
@@ -482,6 +490,10 @@ export default {
         case 'line': return 'Quantità (righe)';
         default: return 'Quantità';
       }
+    },
+
+    clientNation() {
+      return this.form.clientId?.state;
     },
 
     servicePriceLabel() {
