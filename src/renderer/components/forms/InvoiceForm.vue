@@ -136,7 +136,7 @@
               <th>Nome servizio</th>
               <th>Tipo servizio</th>
               <th>Ore/Righe</th>
-              <th>Prezzo (€)</th>
+              <th> {{ servicePriceLabel }} </th>
               <th style="width: 8%;"></th>
             </tr>
           
@@ -216,7 +216,7 @@
 
             <FloatingLabel
               id="service-price"
-              label="Prezzo"
+              :label="servicePriceLabel"
               :class="{ 'is-invalid': hasError('servicePrice') }"
             >
               <input
@@ -482,6 +482,12 @@ export default {
         case 'line': return 'Quantità (righe)';
         default: return 'Quantità';
       }
+    },
+
+    servicePriceLabel() {
+      return this.nationIsCh
+        ? 'Prezzo (chf)'
+        : 'Prezzo (€)';
     },
 
     serviceQuantityEnabled() {
