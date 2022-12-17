@@ -195,9 +195,14 @@ export default class InvoicePDF {
   }
 
   private prepareServiceTotalAmount(service: any): string {
-    if (!service || service.price) {
+    if (!service || !service.price) {
       
       return this.currencyPrice(0);
+    }
+
+    if (service.totalAmount) {
+      console.log('total amount');
+      return this.currencyPrice(service.totalAmount);
     }
 
     if (
