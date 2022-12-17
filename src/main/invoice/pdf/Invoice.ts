@@ -159,6 +159,8 @@ export default class InvoicePDF {
       holder: data.client?.holder ?? '-',
       name: data.client?.name ?? '-',
       address: data.client?.address ?? '-',
+      city: data.client?.city,
+      state: this.stateTrans(data.client?.state),
       zipcode: data.client?.zipcode ?? '-',
       piva: data.client?.piva ?? '-',
     };
@@ -226,6 +228,15 @@ export default class InvoicePDF {
       case ServiceTypes.HOUR: return 'Stunde';
       case ServiceTypes.LINE: return 'Zeile';
       case ServiceTypes.MIN:  return 'Mindenstpreis';
+    }
+
+    return '-';
+  }
+
+  private stateTrans(state: string|null): string {
+    switch(state) {
+      case 'DE': return 'Deutschland';
+      case 'CH': return 'Schweiz';
     }
 
     return '-';

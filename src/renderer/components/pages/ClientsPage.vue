@@ -90,7 +90,7 @@ export default {
         holder: '',
         address: '',
         city: '',
-        state: '',
+        state: 'DE',
         piva: '',
         zipcode: '',
       },
@@ -165,7 +165,7 @@ export default {
         holder: '',
         address: '',
         city: '',
-        state: '',
+        state: 'DE',
         piva: '',
         zipcode: '',
       };

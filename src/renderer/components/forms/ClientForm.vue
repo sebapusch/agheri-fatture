@@ -71,15 +71,21 @@
 
       <div class="col-6">
         <FloatingLabel id="state" label="Nazione">
-          <input 
-            type="text" 
-            class="form-control"
-            id="state" 
+          <select 
+            id="state"
+            class="form-select"
             placeholder="state"
             v-model="client.state"
           >
+            <option 
+              v-for="{ label, value } in nations"
+              :value="value"
+            >
+              {{ label }}
+            </option>
+          </select>
         </FloatingLabel>
-      </div>
+    </div>
 
       <div class="col-6">
         <FloatingLabel id="piva" label="Partita Iva" class="col-6">
@@ -119,6 +125,14 @@
 import FloatingLabel from '../FloatingLabel.vue';
 import ContainerDiv from '../ContainerDiv.vue';
 
+const nations = [{
+    value: 'DE',
+    label: 'Germania',
+  }, {
+    value: 'CH',
+    label: 'Svizzera',
+  }];
+
 export default {
 
   name: 'ClientForm',
@@ -141,7 +155,9 @@ export default {
   },
 
   data() {
-    return {};
+    return {
+      nations,
+    };
   },
 
   methods: {

@@ -1,4 +1,5 @@
 import { DataTypes, Sequelize } from 'sequelize';
+import { Nations } from './Invoice';
 
 export default function (sequelize: Sequelize) {
   sequelize.define('client', {
@@ -25,7 +26,11 @@ export default function (sequelize: Sequelize) {
         type: DataTypes.TEXT
     },
     state: {
-        type: DataTypes.TEXT
+        allowNull: false,
+        type: DataTypes.TEXT,
+        validate: {
+            isIn: [Object.values(Nations)],
+        }
     },
     piva: {
         type: DataTypes.TEXT
