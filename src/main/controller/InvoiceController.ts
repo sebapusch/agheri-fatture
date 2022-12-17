@@ -31,7 +31,7 @@ export default class InvoiceController extends Controller {
   protected register()
   {
     super.register(['update', 'delete']);
-    this.handle('preview', this.preview);
+    this.handle('preview', async (invoice: any) => this.preview(invoice));
     this.handle('save', async (id: string) => this.save(id));
     this.handle('previewFromId', async (id: string) => this.previewFromId(id));
     this.handle('exchangeRate', this.getChfExchangeRage);
@@ -40,6 +40,16 @@ export default class InvoiceController extends Controller {
   }
 
   private async preview(invoice: any) {
+
+    if (invoice.clientId) {
+      const { client } = this.sequelize.models;
+      const invoiceClient = await client.findByPk(invoice.clientId);
+
+      if (invoiceClient) {
+        invoice.client = invoiceClient.get();
+      }
+    }
+
     const pdf = new InvoicePDF(invoice);
 
     return await pdf.render();
