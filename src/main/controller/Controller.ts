@@ -1,5 +1,5 @@
 import { ipcMain, WebContents, IpcMainEvent, WebFrameMain } from 'electron';
-import { Sequelize, Op, FindOptions } from 'sequelize';
+import { Sequelize, Op, FindOptions, Model, ModelCtor, ModelStatic } from 'sequelize';
 
 type ListOptions = {
   attributes?: Array<string>,
@@ -26,20 +26,13 @@ type Response = {
 abstract class Controller {
 
   protected sequelize: Sequelize;
-  protected modelName: string;
-  protected searchable: Array<string>;
+  abstract model: ModelStatic<Model>;
+  abstract searchable: Array<string>;
   protected defaultOrder = ['createdAt', 'DESC'];
 
-  protected constructor(sequelize: Sequelize, modelName: string, searchable: Array<string> = []) {
+  protected constructor(sequelize: Sequelize) {
     this.sequelize = sequelize;
-    this.modelName = modelName;
-    this.searchable = searchable;
-    this.register();
   };
-
-  protected model() {
-    return this.sequelize.models[this.modelName];
-  }
 
   protected register(except: Array<string> = []) {
     const handlerMap = {
@@ -61,7 +54,7 @@ abstract class Controller {
 
   protected handle(event: string, handler: Function) {
 
-    const eventName = `${this.modelName}.${event}`;
+    const eventName = `${this.model.name}.${event}`;
 
     const response: Response = {
       success: true,
@@ -105,7 +98,7 @@ abstract class Controller {
   }
 
   protected async find(id: string) {
-    const model = await this.model().findByPk(id);
+    const model = await this.model.findByPk(id);
 
     if (typeof model === null) {
       throw new Error('Nessun elemento trovato corrispondente alla chiave passata');
@@ -115,21 +108,21 @@ abstract class Controller {
   }
 
   protected async store(values) {
-    return await this.model().create(values);
+    return await this.model.create(values);
   }
 
   protected async delete(id: string): Promise<number> {
-    return await this.model().destroy({
+    return await this.model.destroy({
       where: {
         id: id
       }
     });
   }
 
-  protected async update(id: string, values): Promise<boolean> {
+  protected async update(id: string, values: any): Promise<boolean> {
     const options = { where: { id } };
-    const [updated] = await this.model()
-        .update(values, options);
+
+    const [updated] = await this.model.update(values, options);
 
     return updated > 0;
   }
@@ -138,8 +131,8 @@ abstract class Controller {
 
     const listOptions = this.buildListOptions(options);
 
-    const data = await this.model().findAll(listOptions);
-    const all = await this.model().count(listOptions);
+    const data = await this.model.findAll(listOptions);
+    const all = await this.model.count(listOptions);
 
     return {
       data: data.map((row) => row.get()),

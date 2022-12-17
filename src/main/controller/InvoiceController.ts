@@ -1,5 +1,5 @@
 import InvoicePDF from '../invoice/pdf/Invoice';
-import { Sequelize } from 'sequelize';
+import { Model, ModelStatic, Sequelize } from 'sequelize';
 import { Controller, ListOptions, ListResponse } from './Controller';
 import { ServiceTypes } from '../sequelize/models/Service';
 import { Nations } from '../sequelize/models/Invoice';
@@ -20,12 +20,14 @@ type Service = {
 
 export default class InvoiceController extends Controller {
   
+  model: ModelStatic<Model>;
+
+  searchable = [];
+
   constructor(sequelize: Sequelize) {
-    super(
-      sequelize, 
-      'invoice',
-      [],
-    );
+    super(sequelize);
+    this.model = sequelize.models.invoice;
+    this.register();
   };
 
   protected register()
@@ -77,13 +79,13 @@ export default class InvoiceController extends Controller {
     });
   }
 
-  protected async store(values) {
+  protected async store(values: any) {
 
-    const { invoice, service } = this.sequelize.models;
+    const { service } = this.sequelize.models;
 
     values = await this.prepare(values);
 
-    const created = await invoice.create(values, {
+    const created = await this.model.create(values, {
       include: [service],
     });
 
@@ -97,29 +99,27 @@ export default class InvoiceController extends Controller {
     const listOptions = this.buildListOptions(options);
 
     listOptions.include = 'client';
-    
-    const { invoice } = this.sequelize.models;
 
-    const data = await invoice.findAll(listOptions);
+    const data = await this.model.findAll(listOptions);
 
     return {
       data: data.map(row => row.get({plain: true})),
-      total: await invoice.count(listOptions),
+      total: await this.model.count(listOptions),
     }
   }
 
   protected async delete(id: string): Promise<number> {
-    const { invoice, service } = this.sequelize.models;
+    const { service } = this.sequelize.models;
 
     await service.destroy({ where: { invoiceId: id }});
     
-    return await invoice.destroy({ where: { id }});
+    return await this.model.destroy({ where: { id }});
   }
 
   protected async find(id: string) {
-    const { invoice, service, client } = this.sequelize.models;
+    const { service, client } = this.sequelize.models;
 
-    const result = await invoice.findByPk(id, {
+    const result = await this.model.findByPk(id, {
       include: [client, service],
     });
 

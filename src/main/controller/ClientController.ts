@@ -1,10 +1,16 @@
-import { Sequelize } from 'sequelize';
+import { Model, ModelStatic, Sequelize } from 'sequelize';
 import {Controller} from './Controller';
 
 export default class UserController extends Controller {
+
+  model: ModelStatic<Model>;
+  
+  searchable = ['name', 'holder'];
   
   constructor(sequelize: Sequelize) {
-    super(sequelize, 'client', ['name', 'holder']);
+    super(sequelize);
+    this.model = sequelize.models.client;
+    this.register();
   }
 
   protected register(): void {
