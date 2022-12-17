@@ -55,11 +55,22 @@ body {
 
 .icon-btn {
   background: transparent;
+  border-radius: 100%;
   border: none;
   padding: $spacer * 0.5;
-  &:hover {
-    background: #fff;
-    border-radius: 100%;
+}
+
+@each $color, $value in $theme-colors {
+  .icon-btn-#{$color} {
+    color: $value;
+    &:hover {
+      background: $value;
+      @if $color == "light" {
+        color: $dark;
+      } @else {
+        color: $light;
+      }
+    }
   }
 }
 

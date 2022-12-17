@@ -13,20 +13,20 @@
     >
       <template #rowActionBefore="{ id }">
         <button
-          class="icon-btn"
+          class="icon-btn icon-btn-dark"
           @click="handlePreview(id)"
         >
           <span class="material-icons align-middle">visibility</span>
         </button>
         <button
-          class="icon-btn"
+          class="icon-btn icon-btn-primary"
           @click="save(id)"
         >
           <span class="material-icons align-middle">file_download</span>
         </button>
 
         <button
-          class="icon-btn"
+          class="icon-btn icon-btn-success"
           @click="handleAdd(id)"
         >
           <span class="material-icons align-middle">add_circle</span>

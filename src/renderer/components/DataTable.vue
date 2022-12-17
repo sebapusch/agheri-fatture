@@ -73,19 +73,19 @@
               <slot name="rowActionBefore" v-bind="row"></slot>
 
               <button
-                class="icon-btn"
-                v-if="hasAction('delete')" 
-                @click="$emit('delete', row.id)"
-              >
-                <span class="material-icons align-middle">delete</span>
-              </button>
-
-              <button
-                class="icon-btn icon-btn-danger"
+                class="icon-btn icon-btn-primary"
                 v-if="hasAction('edit')"
                 @click="$emit('edit', row.id)"
               >
                 <span class="material-icons align-middle">edit</span>
+              </button>
+
+              <button
+                class="icon-btn icon-btn-danger"
+                v-if="hasAction('delete')" 
+                @click="$emit('delete', row.id)"
+              >
+                <span class="material-icons align-middle">delete</span>
               </button>
 
               <slot name="rowAction" v-bind="row"></slot>
