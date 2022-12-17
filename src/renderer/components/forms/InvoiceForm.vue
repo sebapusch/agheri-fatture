@@ -167,15 +167,23 @@
         <div class="row mb-4">
 
           <div class="col-6">
-            <FloatingLabel id="service-name" label="Nome">
+            <FloatingLabel 
+              id="service-name" 
+              label="Nome"
+              :class="{ 'is-invalid': hasError('serviceName') }"
+            >
               <input 
                 type="text"
                 class="form-control" 
+                :class="{ 'is-invalid': hasError('serviceName') }"
                 id="service-name" 
                 placeholder="Nome Servizio"
                 v-model="service.name"
               >
             </FloatingLabel>
+            <div class="invalid-feedback">
+              {{ errors.serviceName }}
+            </div>
           </div>
           <div class="col-6">
             <FloatingLabel id="service-type" label="Tipo">
@@ -200,32 +208,48 @@
 
           <div class="col-6">
 
-            <FloatingLabel id="service-price" label="Prezzo">
+            <FloatingLabel
+              id="service-price"
+              label="Prezzo"
+              :class="{ 'is-invalid': hasError('servicePrice') }"
+            >
               <input
                 v-model="service.price"
                 id="service-price"
                 class="form-control"
+                :class="{ 'is-invalid': hasError('servicePrice') }"
                 type="number"
                 placeholder="Prezzo"
               >
             </FloatingLabel>
+            <div class="invalid-feedback">
+              {{ errors.servicePrice }}
+            </div>
 
           </div>
 
           <div class="col-6">
 
-            <FloatingLabel id="service-quantity" :label="serviceQuantityLabel">
+            <FloatingLabel 
+              id="service-quantity" 
+              :label="serviceQuantityLabel"
+              :class="{ 'is-invalid': hasError('serviceQuantity') }"
+            >
               <input
                 v-model="service.quantity"
                 id="service-quantity"
                 class="form-control"
+                :class="{ 'is-invalid': hasError('serviceQuantity') }"
                 type="number"
                 placeholder="Quantità"
                 :disabled="!serviceQuantityEnabled"
               >
             </FloatingLabel>
-
+            <div class="invalid-feedback">
+              {{ errors.serviceQuantity }}
             </div>
+
+          </div>
 
         </div>
 
@@ -242,6 +266,7 @@
 <script>
 
 import { client as clientApi, invoice as invoiceApi } from '../../api';
+import { gt } from '../../validation';
 import Multiselect from 'vue-multiselect';
 import Modal from '../Modal.vue';
 import FloatingLabel from '../FloatingLabel.vue';
@@ -283,6 +308,13 @@ export default {
         type: 'flat',
         quantity: null,
         price: null,
+      },
+      errors: {
+        service: {
+          name: '',
+          quantity: '',
+          price: '',
+        }
       },
       serviceTypes: [{
           label: 'Tasso fisso',
@@ -348,6 +380,11 @@ export default {
     },
 
     handleServiceAdd() {
+
+      if (false === this.validateService()) {
+        return;
+      }
+
       if (!this.serviceQuantityEnabled) {
         this.service.quantity = null;
       }
@@ -358,6 +395,38 @@ export default {
       this.resetServiceForm();
     },
 
+    validateService() {
+
+      this.resetServiceErrors();
+      let errors = false;
+
+      if (['hour', 'line'].includes(this.service.type)) {
+
+        if (false === gt(this.service.quantity, 0)) {
+          this.errors.serviceQuantity = 'Inserisci una quantità valida';
+          errors = true;
+        }
+      }
+
+      if (false === gt(this.service.price, 0)) {
+        this.errors.servicePrice = 'Inserisci un prezzo valido';
+        errors = true;
+      }
+
+      if (! this.service.name) {
+        this.errors.serviceName = 'Inserisci un nome valido';
+        errors = true;
+      }
+
+      return false === errors;
+    },
+
+    resetServiceErrors() {
+      this.errors.serviceQuantity = '';
+      this.errors.servicePrice = '';
+      this.errors.serviceName = '';
+    },
+
     resetServiceForm() {
       this.service = {
         name: null,
@@ -365,6 +434,10 @@ export default {
         quantity: null,
         price: null,
       };
+    },
+
+    hasError(field) {
+      return !!this.errors[field];
     },
 
     async getProgressNum() {
