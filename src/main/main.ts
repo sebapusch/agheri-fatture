@@ -1,5 +1,5 @@
-import {app, BrowserWindow, ipcMain, session} from 'electron';
-import {join} from 'path';
+import { app, BrowserWindow, session } from 'electron';
+import { join } from 'path';
 import registerSequelize from './sequelize';
 import registerControllers from './controller';
 

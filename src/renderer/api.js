@@ -14,6 +14,7 @@ const invoice = {
   find: async (id) => await window.bridge.findInvoice(id),
   save: async (id) => await window.bridge.saveInvoice(id),
   delete: async (id) => await window.bridge.deleteInvoice(id),
+  progressNum: async () => await window.bridge.progressNumInvoice(),
 };
 
 export {client, invoice};

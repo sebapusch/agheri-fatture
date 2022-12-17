@@ -98,6 +98,7 @@ const api = [
       'find',
       'save',
       'delete',
+      'progressNum',
     ]
   }
 ] 

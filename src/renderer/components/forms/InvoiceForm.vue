@@ -39,7 +39,8 @@
           </FloatingLabel>
           <button 
             class="btn btn-light border"
-            @click="generateCode"
+            @click="getProgressNum"
+            :disabled="loading.exchangeRate"
           >
             <span class="material-icons align-middle">autorenew</span>
           </button>
@@ -305,6 +306,7 @@ export default {
       }],
       loading: {
         exchangeRate: false,
+        progressNum: false,
       }
     };
   },
@@ -315,8 +317,6 @@ export default {
       handler(value) {
 
         const invoice = JSON.parse(JSON.stringify(value));
-
-        console.log(invoice);
 
         if (value.clientId) {
           invoice.clientId = value.clientId.id;
@@ -367,8 +367,14 @@ export default {
       };
     },
 
-    generateCode() {
-      this.form.code = new Date().toLocaleString();
+    async getProgressNum() {
+      this.loading.progressNum = true;
+      try {
+        this.form.code = await invoiceApi.progressNum();
+      } catch (e) {
+        this.toast.error(e.message);
+      }
+      this.loading.progressNum = false;
     },
 
     async getExchangeRate() {
