@@ -201,7 +201,6 @@ export default class InvoicePDF {
     }
 
     if (service.totalAmount) {
-      console.log('total amount');
       return this.currencyPrice(service.totalAmount);
     }
 
