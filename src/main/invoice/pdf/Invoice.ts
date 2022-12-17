@@ -172,8 +172,8 @@ export default class InvoicePDF {
         quantity: service.quantity ?? '-',
         price: this.currencyPrice(service.price ?? 0),
         priceNum: service.price ?? 0,
+        type: this.serviceTypeTrans(service.type),
         totalAmount: this.prepareServiceTotalAmount(service),
-        // todo type?
       }));
     }
 
@@ -218,5 +218,16 @@ export default class InvoicePDF {
     }
 
     return `${currency} ${price}`;
+  }
+
+  private serviceTypeTrans(type: string|null): string {
+    switch(type) {
+      case ServiceTypes.FLAT: return 'Pauschal';
+      case ServiceTypes.HOUR: return 'Stunde';
+      case ServiceTypes.LINE: return 'Zeile';
+      case ServiceTypes.MIN:  return 'Mindenstpreis';
+    }
+
+    return '-';
   }
 }

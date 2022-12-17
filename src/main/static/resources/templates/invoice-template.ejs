@@ -26,8 +26,8 @@
       </div>
 
       <div class="col">
-        <b>Invoice number: </b> <%= invoice.code %><br> 
-        <b>Date: </b> <%= invoice.date %><br> 
+        <b>Rechnung nr.: </b> <%= invoice.code %><br> 
+        <b>Datum: </b> <%= invoice.date %><br> 
       </div>
 
     </div>
@@ -36,35 +36,34 @@
       <table id="service-table">
         <thead>
           <tr>
-            <th>Servizio</th>
-            <th>Quantità</th>
-            <th>Prezzo</th>
-            <th>Total</th>
+            <th>Auftragsnr.</th>
+            <th></th>
+            <th>Anzahl</th>
+            <th>Preis</th>
+            <th>Gesamtpreis</th>
           </tr>
         </thead>
         <tbody>
-          <% services.forEach(({ name, quantity, price, totalAmount }) => { %>
+          <% services.forEach(({ name, quantity, price, totalAmount, type }) => { %>
   
             <tr>
               <td><%= name %></td>
+              <td><%= type %></td>
               <td><%= quantity %></td>
               <td><%= price %></td>
-              <td><%= totalAmount %></td>
+              <td class="text-right"><%= totalAmount %></td>
             </tr>
   
           <% }) %>
             <tr class="no-border-row">
-              <td></td>
-              <td></td>
+              <td></td><td></td><td></td>
               <td>Summe</td>
-              <td><%= invoice.totalAmount %></td>
+              <td class="text-right"><%= invoice.totalAmount %></td>
             </tr>
           <% if (options.displayEur) { %>
             <tr class="no-border-row">
-              <td></td>
-              <td></td>
-              <td></td>
-              <td><%= invoice.totalAmountEur %></td>
+              <td></td><td></td><td></td><td></td>
+              <td class="text-right"><%= invoice.totalAmountEur %></td>
             </tr>
           <% } %>
         </tbody>
