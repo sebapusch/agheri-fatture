@@ -22,7 +22,7 @@
 
     </div>
 
-    <div class="flex-fill">
+    <div class="flex-fill p-5">
         <component :is="currentPage" v-bind="componentProps"></component>
     </div>
   </div>

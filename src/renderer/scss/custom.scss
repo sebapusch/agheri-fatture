@@ -25,6 +25,12 @@ $primary: #01017a;
   src: url('../assets/MaterialIconsOutlined-Regular.otf');
 }
 
+body {
+  background: url('../assets/background.jpg') no-repeat center center fixed; 
+  -webkit-background-size: cover;
+  background-size: cover;
+}
+
 .material-icons {
   font-family: 'Material Icons';
   font-weight: normal;
