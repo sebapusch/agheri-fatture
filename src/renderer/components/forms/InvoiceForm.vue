@@ -137,17 +137,23 @@
               <th>Tipo servizio</th>
               <th>Ore/Righe</th>
               <th>Prezzo (€)</th>
+              <th style="width: 8%;"></th>
             </tr>
           
           </thead>
           <tbody>
             <tr
-              v-for="service in form.services"
+              v-for="service, i in form.services"
             >
               <td class="ps-2"> {{ service.name }} </td>
               <td class="ps-2"> {{ serviceTypeLabel(service.type) }} </td>
               <td class="ps-2"> {{ service.quantity ?? '-' }} </td>
               <td class="ps-2"> {{ service.price }} </td>
+              <td class="text-center">
+                <button class="icon-btn" @click="removeService(i)">
+                  <span class="material-icons align-middle">delete</span>
+                </button>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -425,6 +431,10 @@ export default {
       this.errors.serviceQuantity = '';
       this.errors.servicePrice = '';
       this.errors.serviceName = '';
+    },
+
+    removeService(index) {
+      this.form.services.splice(index, 1);
     },
 
     resetServiceForm() {
