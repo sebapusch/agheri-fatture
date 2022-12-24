@@ -1,5 +1,6 @@
 import { ipcMain, WebContents, IpcMainEvent, WebFrameMain } from 'electron';
 import { Sequelize, Op, FindOptions, Model, ModelCtor, ModelStatic } from 'sequelize';
+import App from '../App';
 
 type ListOptions = {
   attributes?: Array<string>,
@@ -17,21 +18,17 @@ type ListResponse = {
   data: Array<object>
 };
 
-type Response = {
-  channel: string,
-  success: boolean,
-  content: any,
-}
-
 abstract class Controller {
 
   protected sequelize: Sequelize;
+  protected app: App;
   abstract model: ModelStatic<Model>;
   abstract searchable: Array<string>;
   protected defaultOrder = ['createdAt', 'DESC'];
 
-  protected constructor(sequelize: Sequelize) {
-    this.sequelize = sequelize;
+  protected constructor(app: App) {
+    this.app = app;
+    this.sequelize = app.sequelize;
   };
 
   protected register(except: Array<string> = []) {
@@ -43,59 +40,16 @@ abstract class Controller {
       'find': async (id: string) => this.find(id),
     }
 
-    for (const event in handlerMap) {
-      if (except.includes(event)) {
+    for (const action in handlerMap) {
+      if (except.includes(action)) {
         continue;
       }
 
-      this.handle(event, handlerMap[event]);
+      const event = `${this.model.name}.${action}`;
+
+      this.app.handle(event, handlerMap[action]);
     }
-  }
-
-  protected handle(event: string, handler: Function) {
-
-    const eventName = `${this.model.name}.${event}`;
-
-    const response: Response = {
-      success: true,
-      content: null,
-      channel: eventName,
-    }
-
-    ipcMain.on(eventName, async (event: IpcMainEvent, ...args) => {
-      try {
-
-        this.validateSender(event.senderFrame);
-
-        response.content = await handler(...args);
-        response.success = true;
-
-        this.respond(event.sender, response);
-
-      } catch (error) {
-
-        console.log(error);
-
-        response.content = error;
-        response.success = false;
-        this.respond(event.sender, response);
-      }
-    });
-
-  }
-
-  private validateSender(frame: WebFrameMain) {
-    const senderUrl = new URL(frame.url);
-
-    if (false === ['electronjs.org', 'localhost:8080'].includes(senderUrl.host)) {
-      throw new Error('Errore di sicurezza');
-    }
-  }
-
-  private respond(sender: WebContents, response: Response)
-  {
-    sender.send(response.channel, response);
-  }
+  }  
 
   protected async find(id: string) {
     const model = await this.model.findByPk(id);

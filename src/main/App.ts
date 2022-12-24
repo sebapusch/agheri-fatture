@@ -1,10 +1,12 @@
-import { app, BrowserWindow, session } from "electron";
+import { app, BrowserWindow, ipcMain, IpcMainEvent, session, WebContents, WebFrameMain } from "electron";
 import { Sequelize } from "sequelize";
 import initSequelize from './sequelize';
 import { join } from 'path';
 import { Controller } from "./controller/Controller";
 import UserController from "./controller/ClientController";
 import InvoiceController from "./controller/InvoiceController";
+import { factory } from "electron-json-config";
+import Config from "electron-json-config/lib/Config";
 
 export type AppSettings = {
     configFilePath: string,
@@ -16,25 +18,37 @@ export type AppSettings = {
     },
 };
 
+type Response = {
+  channel: string,
+  success: boolean,
+  content: any,
+}
+
 const controllers = [
   UserController,
   InvoiceController,
 ];
 
+const settingsTypeMap = {
+  'progressive_num': 'number',
+};
+
 export default class App {
 
     ready: boolean = false;
     settings: AppSettings;
-
+    
+    config: Config;
     electron: Electron.App;
-    sequelize?: Sequelize;
-    mainWindow?: BrowserWindow;
+    sequelize!: Sequelize;
+    mainWindow!: BrowserWindow;
     controllers: Array<Controller>
 
     constructor(settings: AppSettings) {
       this.settings = settings;
       this.electron = app;
       this.controllers = [];
+      this.config = factory(this.settings.configFilePath);
     }
 
     public async run() {
@@ -43,7 +57,7 @@ export default class App {
       const sequelize = await initSequelize();
 
       this.sequelize = sequelize;
-      this.controllers = controllers.map(C => new C(sequelize));
+      this.controllers = controllers.map(C => new C(this));
       this.mainWindow = this.createWindow(this.settings.window);
 
       session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
@@ -59,7 +73,54 @@ export default class App {
         this.electron.quit();
       });
 
+      this.registerConfigHandlers();
+
       this.ready = true;
+    }
+
+    public handle(event: string, handler: Function) {
+
+      console.log(event)
+  
+      const response: Response = {
+        success: true,
+        content: null,
+        channel: event,
+      }
+  
+      ipcMain.on(event, async (e: IpcMainEvent, ...args) => {
+        try {
+  
+          this.validateSender(e.senderFrame);
+  
+          response.content = await handler(...args);
+          response.success = true;
+  
+          this.respond(e.sender, response);
+  
+        } catch (error) {
+  
+          console.log(error);
+  
+          response.content = error;
+          response.success = false;
+          this.respond(e.sender, response);
+        }
+      });
+  
+    }
+
+    private validateSender(frame: WebFrameMain) {
+      const senderUrl = new URL(frame.url);
+  
+      if (false === ['electronjs.org', 'localhost:8080'].includes(senderUrl.host)) {
+        throw new Error('Errore di sicurezza');
+      }
+    }
+
+    private respond(sender: WebContents, response: Response)
+    {
+      sender.send(response.channel, response);
     }
 
     private createWindow(settings: AppSettings['window']) {
@@ -82,5 +143,31 @@ export default class App {
         }
 
         return mainWindow;
+    }
+
+    private async registerConfigHandlers() {
+      this.handle('settings.get', (key: string) => this.getConfig(key));
+      this.handle('settings.getAll', () => this.getAllConfig());
+      this.handle('settings.set', ({ key, value }) => this.setConfig(key, value));
+    }
+
+    private async setConfig(key: string, value: any): Promise<void> {
+      if (false === settingsTypeMap.hasOwnProperty(key)) {
+        throw new Error('Impostazione non valida');
+      }
+  
+      if (typeof value !== settingsTypeMap[key]) {
+        throw new Error('Valore impostazione non valido');
+      }
+
+      this.config.set(key, value);
+    }
+
+    private async getConfig(key: string): Promise<any> {
+      return this.config.get(key);
+    }
+
+    private async getAllConfig(): Promise<object> {
+      return this.config.all();
     }
 }

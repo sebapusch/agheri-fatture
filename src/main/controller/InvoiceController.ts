@@ -6,6 +6,7 @@ import { Nations } from '../sequelize/models/Invoice';
 import request from 'request';
 import { dialog, shell } from 'electron';
 import { settings, setSettings } from '../helpers';
+import App from '../App';
 
 const exchangeRateUri = 'https://api.exchangerate.host/latest?base=CHF&symbols=EUR';
 const serviceTypes = [...Object.values(ServiceTypes)] as const;
@@ -24,21 +25,21 @@ export default class InvoiceController extends Controller {
 
   searchable = [];
 
-  constructor(sequelize: Sequelize) {
-    super(sequelize);
-    this.model = sequelize.models.invoice;
+  constructor(app: App) {
+    super(app);
+    this.model = this.app.sequelize.models.invoice;
     this.register();
   };
 
   protected register()
   {
     super.register(['update', 'delete']);
-    this.handle('preview', async (invoice: any) => this.preview(invoice));
-    this.handle('save', async (id: string) => this.save(id));
-    this.handle('previewFromId', async (id: string) => this.previewFromId(id));
-    this.handle('exchangeRate', this.getChfExchangeRage);
-    this.handle('delete', (id: string) => this.delete(id));
-    this.handle('progressNum', this.getProgressNum);
+    this.app.handle('invoice.preview', async (invoice: any) => this.preview(invoice));
+    this.app.handle('invoice.save', async (id: string) => this.save(id));
+    this.app.handle('invoice.previewFromId', async (id: string) => this.previewFromId(id));
+    this.app.handle('invoice.exchangeRate', this.getChfExchangeRage);
+    this.app.handle('invoice.delete', (id: string) => this.delete(id));
+    this.app.handle('invoice.progressNum', this.getProgressNum);
   }
 
   private async preview(invoice: any) {

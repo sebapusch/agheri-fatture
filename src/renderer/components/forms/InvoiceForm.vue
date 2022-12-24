@@ -150,7 +150,7 @@
               <td class="ps-2"> {{ service.quantity ?? '-' }} </td>
               <td class="ps-2"> {{ service.price }} </td>
               <td class="text-center">
-                <button class="icon-btn" @click="removeService(i)">
+                <button class="icon-btn icon-btn-danger" @click="removeService(i)">
                   <span class="material-icons align-middle">delete</span>
                 </button>
               </td>

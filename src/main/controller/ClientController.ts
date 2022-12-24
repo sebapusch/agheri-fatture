@@ -1,4 +1,5 @@
 import { Model, ModelStatic, Sequelize } from 'sequelize';
+import App from '../App';
 import {Controller} from './Controller';
 
 export default class UserController extends Controller {
@@ -7,15 +8,15 @@ export default class UserController extends Controller {
   
   searchable = ['name', 'holder'];
   
-  constructor(sequelize: Sequelize) {
-    super(sequelize);
-    this.model = sequelize.models.client;
+  constructor(app: App) {
+    super(app);
+    this.model = this.sequelize.models.client;
     this.register();
   }
 
   protected register(): void {
     super.register(['delete']);
-    this.handle('delete', (id: string) => this.delete(id));
+    this.app.handle('client.delete', (id: string) => this.delete(id));
   }
 
   protected async delete(id: string): Promise<number> {
