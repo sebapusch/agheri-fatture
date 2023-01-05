@@ -15,7 +15,7 @@
   </div>
   
   <FloatingLabel
-    v-if="!isBool"
+    v-else
     :id="label"
     :label="label"
     col="12"
