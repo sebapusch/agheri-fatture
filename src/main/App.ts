@@ -30,7 +30,7 @@ const controllers = [
 ];
 
 const settingsTypeMap = {
-  'progressive_num': 'number',
+  'progress_num': 'number',
 };
 
 export default class App {
@@ -146,9 +146,9 @@ export default class App {
     }
 
     private async registerConfigHandlers() {
-      this.handle('settings.get', (key: string) => this.getConfig(key));
-      this.handle('settings.getAll', () => this.getAllConfig());
-      this.handle('settings.set', ({ key, value }) => this.setConfig(key, value));
+      this.handle('config.get', (key: string) => this.getConfig(key));
+      this.handle('config.getAll', () => this.getAllConfig());
+      this.handle('config.set', ({ key, value }) => this.setConfig(key, value));
     }
 
     private async setConfig(key: string, value: any): Promise<void> {

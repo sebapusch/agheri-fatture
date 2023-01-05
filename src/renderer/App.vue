@@ -33,11 +33,13 @@
 import ClientsPage from './components/pages/ClientsPage.vue';
 import InvoiceAdd from './components/pages/InvoiceAdd.vue';
 import InvoiceListPage from './components/pages/InvoiceListPage.vue';
+import ConfigPage from './components/pages/ConfigPage.vue';
 
 const routes = {
   'invoiceAdd': InvoiceAdd,
   'clients': ClientsPage,
   'invoiceList': InvoiceListPage,
+  'config': ConfigPage,
 }
 
 export default {
@@ -47,17 +49,21 @@ export default {
     return {
       page: 'clients',
       routes: [{
-            label: "Clients",
-            icon: "groups",
-            page: 'clients',
+          label: "Clients",
+          icon: "groups",
+          page: 'clients',
         }, {
-            label: "Fatture",
-            icon: "receipt_long",
-            page: 'invoiceList',
+          label: "Fatture",
+          icon: "receipt_long",
+          page: 'invoiceList',
         }, {
-            label: "Nuova fattura",
-            icon: "add",
-            page: 'invoiceAdd',
+          label: "Nuova fattura",
+          icon: "add",
+          page: 'invoiceAdd',
+        }, {
+          label: 'Impostazioni',
+          icon: 'settings',
+          page: 'config',
       }],
       componentProps: {},
     };

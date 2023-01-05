@@ -100,8 +100,16 @@ const api = [
       'delete',
       'progressNum',
     ]
+  },
+  {
+    model: 'config',
+    actions: [
+      'set',
+      'get',
+      'getAll',
+    ]
   }
-] 
+]
 
 const bridge = new Bridge(api);
 

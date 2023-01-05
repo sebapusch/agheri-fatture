@@ -1,7 +1,7 @@
 <template>
   <div class="form-floating">
     <slot></slot>
-    <label for="{{ id }}">{{ label }}</label>
+    <label :for="id">{{ label }}</label>
   </div>
 </template>
 <script>

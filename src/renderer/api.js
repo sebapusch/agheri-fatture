@@ -17,4 +17,10 @@ const invoice = {
   progressNum: async () => await window.bridge.progressNumInvoice(),
 };
 
-export {client, invoice};
+const config = {
+  set: async (set) => await window.bridge.setConfig(set),
+  get: async (key) => await window.bridge.getConfig(key),
+  getAll: async () => await window.bridge.getAllConfig(),
+};
+
+export {client, invoice, config};
