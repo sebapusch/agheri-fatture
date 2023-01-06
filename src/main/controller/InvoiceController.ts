@@ -177,18 +177,24 @@ export default class InvoiceController extends Controller {
   private async save(id: string): Promise<void>
   {
     const invoice = await this.find(id);
-    const { canceled, filePath } = await dialog.showSaveDialog({});
+    const code = invoice.code;
+
+    const { canceled, filePath } = await dialog.showSaveDialog({
+      title: `Salva fattura ${code}`,
+      defaultPath: `${code.replace('/', '-')}.pdf`,
+      filters: [
+        {name: 'Pdf files', extensions: ['pdf']},
+      ],
+    });
     
-    if (canceled) {
+    if (canceled || !filePath) {
       return;
     }
 
     const pdf = new InvoicePDF(invoice);
-    const path = `${filePath}.pdf`;
     
-    await pdf.save(path);
-
-    shell.openPath(path);
+    await pdf.save(filePath);
+    shell.openPath(filePath);
 
     return;
   }
