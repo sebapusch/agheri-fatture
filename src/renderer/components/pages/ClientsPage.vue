@@ -7,10 +7,12 @@
       :data="clients"
       :pages="pages"
       :currentPage="table.page"
+      :sort="table.sort"
       @add="setCurrentAction('add')"
       @delete="handleDelete"
       @edit="handleEdit"
       @search="list"
+      @sort="handleSort"
       @page="handlePage"
     ></DataTable> 
   </div>
@@ -55,14 +57,17 @@ const tableDefinition = [
   {
     name: 'name',
     label: 'Nome',
+    sortable: true,
   },
   {
     name: 'holder',
     label: 'Holder',
+    sortable: true,
   },
   {
     name: 'state',
     label: 'Nazione',
+    sortable: true,
   }
 ];
 
@@ -99,6 +104,10 @@ export default {
         limit: 5,
         offset: 0,
         page: 1,
+        sort: {
+          field: 'name',
+          dir: 'DESC',
+        }
       }
     }
   },
@@ -125,6 +134,12 @@ export default {
       }
 
       this.resetForm();
+    },
+
+    handleSort(sort) {
+      this.table.sort = sort;
+
+      this.list();
     },
 
     handlePage(page) {
@@ -181,10 +196,17 @@ export default {
         offset: this.table.offset,
       };
 
-      console.log(options);
-
       if (searchTerm) {
         options.query = searchTerm;
+      }
+
+      if (this.table.sort) {
+        const sortField = tableDefinition.find(({ name }) => this.table.sort.field === name);
+
+        options.order = {
+          dir: this.table.sort.dir,
+          field: sortField.sortkey ?? sortField.name,
+        };
       }
 
       try {
