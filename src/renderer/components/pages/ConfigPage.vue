@@ -1,50 +1,51 @@
 <template>
-  <div class="card border-light shadow p-3">
-    <ObjectView v-model="config"/>
+  <div class="btn-group mb-1">
+    <button
+      class="btn btn-outline-primary"
+      @click="save"
+    >
+      <span class="material-icons align-middle">save</span>
+    </button>
   </div>
+
+  <div class="card border-light shadow p-3">
+    <div class="container">
+      <ObjectView v-model="config"/>
+    </div>
+  </div>
+
 </template>
 
 <script>
 
 import ObjectView from '../objectView/ObjectView.vue'
+import { useToast } from 'vue-toastification';
 import { config as api } from '../../api';
-
-const config = {
-  progressNum: 'nu'
-};
 
 export default {
   name: 'Config',
+  
+  components: {
+    ObjectView,
+  },
 
+  setup() {
+    return { toast: useToast() };
+  },
+  
   data() {
     return {
       config: {},
     }
   },
 
-  watch: {
-    config: {
-      deep: true,
-      handler(value) {
-        console.log(value);
-      }
-    }
-  },
-
-  setup() {
-    
-  },
-
-  components: {
-    ObjectView,
-  },
-
   methods: {
-    async update(value, key) {
+    async save() {
       try {
-        await api.set(key, value);
+        await api.saveAll(this.config);
+        this.toast.success('Impostazioni salvate con successo');
       } catch (e) {
-        console.log(e.message);
+        this.toast.error(e.message);
       }
     }
   },
