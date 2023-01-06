@@ -1,5 +1,5 @@
 import InvoicePDF from '../invoice/pdf/Invoice';
-import { Model, ModelStatic, Sequelize } from 'sequelize';
+import { Model, ModelStatic, Op, Sequelize } from 'sequelize';
 import { Controller, ListOptions, ListResponse } from './Controller';
 import { ServiceTypes } from '../sequelize/models/Service';
 import { Nations } from '../sequelize/models/Invoice';
@@ -22,7 +22,7 @@ export default class InvoiceController extends Controller {
   
   model: ModelStatic<Model>;
 
-  searchable = [];
+  searchable = ['code', 'date', '$client.name$'];
 
   constructor(app: App) {
     super(app);
@@ -98,7 +98,7 @@ export default class InvoiceController extends Controller {
     
     const listOptions = this.buildListOptions(options);
 
-    listOptions.include = 'client';
+    listOptions.include = this.sequelize.models.client;
 
     const data = await this.model.findAll(listOptions);
 

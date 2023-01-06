@@ -9,6 +9,7 @@
       :sort="table.sort"
       @page="handlePage"
       @sort="handleSort"
+      @search="list"
       @delete="handleDelete"
     >
       <template #rowActionBefore="{ id }">
