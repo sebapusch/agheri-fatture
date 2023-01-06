@@ -2,7 +2,7 @@
 
   <div v-if="isBool" class="form-check">
     <input 
-      :id="label" 
+      :id="id" 
       :checked="modelValue" 
       @change="updateValue" 
       class="form-check-input my-2" 
@@ -16,13 +16,13 @@
   
   <FloatingLabel
     v-else
-    :id="label"
+    :id="id"
     :label="label"
     col="12"
     class="my-2"
   >
     <input 
-      :id="label"
+      :id="id"
       :type="inputType"
       :value="modelValue"
       @change="updateValue"
@@ -48,6 +48,7 @@
     data() {
       return {
         type: typeof this.modelValue,
+        id: crypto.randomUUID(),
       };
     },
 

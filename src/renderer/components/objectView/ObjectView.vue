@@ -71,11 +71,16 @@ export default {
       handler(value) {
         this.$emit('update:modelValue', value);
       },
-    }
+    },
+    modelValue: {
+      deep: true,
+      handler(value) {
+        this.object = value;
+      },
+    },
   },
   
   methods: {
-
     isArray(value) {
       return Array.isArray(value);
     },
