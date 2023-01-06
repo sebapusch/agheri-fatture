@@ -22,3 +22,5 @@ try {
 } catch (e) {
   console.log(e);
 }
+
+export { application };

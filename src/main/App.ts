@@ -24,6 +24,7 @@ type AppConfig = {
     title: string,
     address: Array<string>,
     piva: string,
+    wesite: string,
     billing: {
       name: string,
       bank: string,

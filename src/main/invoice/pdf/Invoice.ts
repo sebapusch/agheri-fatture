@@ -2,10 +2,11 @@ import { join } from 'path';
 import ejs from 'ejs';
 import { readFile } from 'fs/promises';
 import { Nations } from '../../sequelize/models/Invoice';
-import { readFileSync } from 'fs';
 import { generatePdf } from 'html-pdf-node';
 import { createWriteStream } from 'original-fs';
 import { ServiceTypes } from '../../sequelize/models/Service';
+import { application } from '../../main';
+
 
 enum Currency {
   EUR = '€',
@@ -56,17 +57,13 @@ const resourcePath = join(__dirname, '../../static/resources')
 
 const templatePath = join(resourcePath, 'templates/invoice-template.ejs');
 const templateStylePath = join(resourcePath, 'template_styles/template-style.css');
-const profilePath = join(resourcePath, 'profile.json');
-//const logo = path.resolve(join(resourcePath, 'images/logo.png'));
 
 export default class InvoicePDF {
 
-  private readonly profile: Profile;
   private renderOptions: RenderOptions;
   private invoice: RenderableInvoice;
 
   public constructor(data: any) {
-    this.profile = JSON.parse(readFileSync(profilePath).toString());
     this.renderOptions = this.setOptions(data);
     this.invoice = this.setInvoice(data);
   }
@@ -98,7 +95,7 @@ export default class InvoicePDF {
     return new Promise((resolve, reject) => {
 
       const data = {
-        profile: this.profile,
+        profile: application.config.get('profile'),
         client: this.invoice.client,
         services: this.invoice.services,
         options: this.renderOptions,
