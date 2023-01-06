@@ -41,8 +41,11 @@ export default {
 
   methods: {
     async save() {
+
+      const config = JSON.parse(JSON.stringify(this.config));
+
       try {
-        await api.saveAll(this.config);
+        await api.save(config);
         this.toast.success('Impostazioni salvate con successo');
       } catch (e) {
         this.toast.error(e.message);

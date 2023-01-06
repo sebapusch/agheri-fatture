@@ -1,7 +1,6 @@
 import { app, BrowserWindow, ipcMain, IpcMainEvent, session, WebContents, WebFrameMain } from "electron";
 import { Sequelize } from "sequelize";
 import initSequelize from './sequelize';
-import { join } from 'path';
 import { Controller } from "./controller/Controller";
 import UserController from "./controller/ClientController";
 import InvoiceController from "./controller/InvoiceController";
@@ -18,6 +17,22 @@ export type AppSettings = {
     },
 };
 
+type AppConfig = {
+  progress_num: number,
+  profile: {
+    name: string,
+    title: string,
+    address: Array<string>,
+    piva: string,
+    billing: {
+      name: string,
+      bank: string,
+      iban: string,
+      bic: string,
+    },
+  }
+};
+
 type Response = {
   channel: string,
   success: boolean,
@@ -28,10 +43,6 @@ const controllers = [
   UserController,
   InvoiceController,
 ];
-
-const settingsTypeMap = {
-  'progress_num': 'number',
-};
 
 export default class App {
 
@@ -148,19 +159,11 @@ export default class App {
     private async registerConfigHandlers() {
       this.handle('config.get', (key: string) => this.getConfig(key));
       this.handle('config.getAll', () => this.getAllConfig());
-      this.handle('config.set', ({ key, value }) => this.setConfig(key, value));
+      this.handle('config.save', (config: AppConfig) => this.saveConfig(config));
     }
 
-    private async setConfig(key: string, value: any): Promise<void> {
-      if (false === settingsTypeMap.hasOwnProperty(key)) {
-        throw new Error('Impostazione non valida');
-      }
-  
-      if (typeof value !== settingsTypeMap[key]) {
-        throw new Error('Valore impostazione non valido');
-      }
-
-      this.config.set(key, value);
+    private async saveConfig(config: AppConfig): Promise<void> {
+      this.config.setBulk(config);
     }
 
     private async getConfig(key: string): Promise<any> {

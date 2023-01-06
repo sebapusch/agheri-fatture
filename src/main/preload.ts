@@ -104,7 +104,7 @@ const api = [
   {
     model: 'config',
     actions: [
-      'set',
+      'save',
       'get',
       'getAll',
     ]

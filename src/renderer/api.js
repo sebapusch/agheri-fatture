@@ -18,7 +18,7 @@ const invoice = {
 };
 
 const config = {
-  set: async (set) => await window.bridge.setConfig(set),
+  save: async (config) => await window.bridge.saveConfig(config),
   get: async (key) => await window.bridge.getConfig(key),
   getAll: async () => await window.bridge.getAllConfig(),
 };
