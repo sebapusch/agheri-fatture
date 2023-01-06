@@ -5,7 +5,6 @@ import { ServiceTypes } from '../sequelize/models/Service';
 import { Nations } from '../sequelize/models/Invoice';
 import request from 'request';
 import { dialog, shell } from 'electron';
-import { settings, setSettings } from '../helpers';
 import App from '../App';
 
 const exchangeRateUri = 'https://api.exchangerate.host/latest?base=CHF&symbols=EUR';
@@ -39,7 +38,7 @@ export default class InvoiceController extends Controller {
     this.app.handle('invoice.previewFromId', async (id: string) => this.previewFromId(id));
     this.app.handle('invoice.exchangeRate', this.getChfExchangeRage);
     this.app.handle('invoice.delete', (id: string) => this.delete(id));
-    this.app.handle('invoice.progressNum', this.getProgressNum);
+    this.app.handle('invoice.progressNum', async () => this.getProgressNum());
   }
 
   private async preview(invoice: any) {
@@ -161,7 +160,7 @@ export default class InvoiceController extends Controller {
 
   private getProgressNum(): string {
     const year = (new Date()).getFullYear();
-    const progressNum = settings('progress_num');
+    const progressNum = this.app.config.get('progress_num');
 
     return `${progressNum}/${year}`;
   }
@@ -171,7 +170,8 @@ export default class InvoiceController extends Controller {
       return;
     }
 
-    setSettings('progress_num', settings('progress_num') + 1);
+    const current = this.app.config.get('progress_num') as number;
+    this.app.config.set('progress_num', current + 1);
   }
 
   private async save(id: string): Promise<void>
