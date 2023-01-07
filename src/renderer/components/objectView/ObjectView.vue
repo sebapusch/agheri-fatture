@@ -1,43 +1,29 @@
 <template>
   <div>
-    <template v-for="(value, key) in object">
 
-      <Primitive 
-        v-if="isPrimitive(value)"
-        v-model="object[key]"
-        :label="key.toString()"
-      />
+    <template 
+      v-for="(item, key) in object"
+    >
+        <Primitive 
+          v-if="isPrimitive(item)" 
+          v-model="object[key]" 
+          :label="label(key)"
+        />
 
-      <div v-else class="card my-3">
-        <div class="card-header">{{ key }}</div>
-        <div class="card-body">
-
-          <template
-            v-if="isArray(value)"
-            v-for="(item, index) in value"
-          >
-
-            <Primitive 
-              v-if="isPrimitive(item)" 
-              v-model="object[key][index]" 
-              :label="arrayLabel(key, index)"
-            />
-
+        <div v-else class="card">
+          <div class="card-header">
+            {{ key }}
+          </div>
+          
+          <div class="card-body">
+            
             <ObjectView 
-              v-else-if="!isArray(item)"
-              v-model="object[key][index]"
+              v-model="object[key]"
+              :modelKey="key"
             />
-
-          </template>
-
-          <ObjectView 
-            v-else-if="isObject(value)"
-            v-model="object[key]"
-          />
-
+          
+          </div>
         </div>
-      </div>
-      
     </template>
   </div>
 </template>
@@ -54,14 +40,20 @@ export default {
   
   props: {
     modelValue: {
-      type: Object,
+      type: [Object, Array],
       required: true,
     },
+    modelKey: {
+      required: false,
+      type: String,
+      default: '',
+    }
   },
 
   data() {
     return {
-      object: this.modelValue
+      object: this.modelValue,
+      isArray: Array.isArray(this.modelValue),
     };
   },
 
@@ -81,20 +73,13 @@ export default {
   },
   
   methods: {
-    isArray(value) {
-      return Array.isArray(value);
+    label(key) {
+      return this.isArray
+        ? `${this.modelKey} ${key}`
+        : key;
     },
-
-    isObject(value) {
-      return value instanceof Object;
-    },
-
     isPrimitive(value) {
-      return false === this.isObject(value);
-    },
-
-    arrayLabel(key, index) {
-      return `${key} - ${index + 1}`;
+      return false === value instanceof Object;
     }
   },
 };
