@@ -12,14 +12,14 @@
 
         <div v-else class="card">
           <div class="card-header">
-            {{ key }}
+            {{ label(key) }}
           </div>
           
           <div class="card-body">
             
             <ObjectView 
               v-model="object[key]"
-              :modelKey="key"
+              :modelKey="label(key)"
             />
           
           </div>
@@ -75,7 +75,7 @@ export default {
   methods: {
     label(key) {
       return this.isArray
-        ? `${this.modelKey} ${key}`
+        ? `${this.modelKey} - ${key}`
         : key;
     },
     isPrimitive(value) {
