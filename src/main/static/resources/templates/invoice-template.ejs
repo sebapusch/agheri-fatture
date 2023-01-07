@@ -34,11 +34,13 @@
 
     </div>
 
+    <p style="padding-left: 20px">Genua, <%= invoice.date %></p>
+
     <h2 class="text-center"><b>Rechnung <%= invoice.code %></b></h2>
 
     <div class="row" id="invoice-details">
       <div class="col" style="padding-top: 40px;">
-        <b>Kontodaten:</b><br>payment
+        <b>Kontodaten:</b><br>
         <%= profile.billing.name %><br>
         <%= profile.billing.bank %><br>
         <%= profile.billing.iban %><br>
