@@ -75,6 +75,7 @@ import Modal from '../Modal.vue';
 const tableDefinition = [{
     name: 'code',
     label: 'Codice',
+    sortable: true,
   }, {
     name: 'date',
     label: 'Data',
