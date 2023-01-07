@@ -332,8 +332,8 @@ export default {
           label: 'Riga',
           value: 'line',
         }, {
-          'label': 'Prezzo minimo',
-          'value': 'Min',
+          label: 'Prezzo minimo',
+          value: 'min',
       }],
       nations: [{
         label: 'Svizzera',
