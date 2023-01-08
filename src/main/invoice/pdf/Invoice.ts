@@ -124,7 +124,10 @@ export default class InvoicePDF {
       currency: Currency.EUR,
       displayEur: false,
       exchangeRate: 0,
+      message: '',
     }
+
+    let message_key = 'message_de';
 
     if (data.nation && data.nation === Nations.CH) {
       renderOptions.currency = Currency.CHF;
@@ -136,7 +139,11 @@ export default class InvoicePDF {
           ? data.exchangeRate
           : 1;
       }
+
+      message_key = 'message_ch';
     }
+
+    renderOptions.message = application.config.get(message_key) as string;
 
     return renderOptions;
   }
