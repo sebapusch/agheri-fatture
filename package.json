@@ -1,7 +1,7 @@
 {
-  "name": "electron-vue-template",
-  "version": "0.1.0",
-  "description": "A minimal Electron + Vue application",
+  "name": "agheri-fatture",
+  "version": "1.0.0",
+  "description": "A simple Electron application to generate invoices",
   "main": "build/main/main.js",
   "scripts": {
     "dev": "node scripts/dev-server.js",
@@ -10,10 +10,10 @@
     "build:mac": "node scripts/build.js && electron-builder --mac",
     "build:linux": "node scripts/build.js && electron-builder --linux"
   },
-  "repository": "https://github.com/deluze/electron-vue-template",
+  "repository": "https://github.com/sebapusch/agheri-fatture/",
   "author": {
-    "name": "Deluze",
-    "url": "https://github.com/Deluze"
+    "name": "sebapusch",
+    "url": "https://github.com/sebapush"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^3.0.3",
