@@ -23,11 +23,11 @@
     "electron": "^20.1.0",
     "electron-builder": "^23.3.3",
     "electron-packager": "^16.0.0",
-    "request": "^2.88.2",
     "typescript": "^4.8.2",
     "vite": "^3.0.9"
   },
   "dependencies": {
+    "request": "^2.88.2",
     "bootstrap": "^5.2.1",
     "docx": "^7.5.0",
     "ejs": "^3.1.8",
@@ -42,9 +42,9 @@
     "vue-toastification": "^2.0.0-rc.5"
   },
   "build": {
-	  "files": [
+    "files": [
       "./build/**/*",
-		  "package.json"
-	  ]
+      "package.json"
+    ]
   }
 }
