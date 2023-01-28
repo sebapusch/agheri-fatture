@@ -1,17 +1,16 @@
-import { join } from 'path';
+import { join, normalize } from 'path';
 import ejs from 'ejs';
 import { readFile } from 'fs/promises';
 import { Nations } from '../../sequelize/models/Invoice';
-import { generatePdf } from 'html-pdf-node';
 import { createWriteStream } from 'original-fs';
 import { ServiceTypes } from '../../sequelize/models/Service';
-import { application } from '../../main';
-
-
+import { application, staticPath } from '../../main';
+import { generatePdf } from './htmlToPdf';
+import type { PaperFormat } from 'puppeteer';
 enum Currency {
   EUR = '€',
   CHF = 'chf',
-};
+}
 
 type RenderOptions = {
   currency: Currency,
@@ -36,36 +35,24 @@ type RenderableInvoice = {
     quantity: number|string,
     price: string,
     priceNum: number,
-    totalAmount: number
+    totalAmount: number,
   }>,
-}
+};
 
-type Profile = {
-  name: string,
-  title: string,
-  address: string,
-  piva: string,
-  billing: {
-    name: string,
-    bank: string,
-    iban: string,
-    bic: string,
-  }
-}
-
-const resourcePath = join(__dirname, '../../static/resources')
-
-const templatePath = join(resourcePath, 'templates/invoice-template.ejs');
-const templateStylePath = join(resourcePath, 'template_styles/template-style.css');
-
+const templatePath = join(staticPath, 'templates/invoice-template.ejs');
+const templateStylePath = join(staticPath, 'template_styles/template-style.css');
 export default class InvoicePDF {
 
-  private renderOptions: RenderOptions;
+  private readonly renderOptions: RenderOptions;
+  private readonly chromiumExecutable: string;
   private invoice: RenderableInvoice;
 
   public constructor(data: any) {
     this.renderOptions = this.setOptions(data);
     this.invoice = this.setInvoice(data);
+    this.chromiumExecutable = normalize(
+        <string>application.config.get('chromium_executable')
+    );
   }
 
   private async style() {
@@ -79,9 +66,12 @@ export default class InvoicePDF {
     }
 
     const options = {
-      format: 'A4',
-      localUrlAccess: true,
-    }
+      executablePath: this.chromiumExecutable,
+      pdfOptions: {
+        format: <PaperFormat>'a4',
+        localUrlAccess: true,
+      },
+    };
 
     const pdf: Buffer = await generatePdf(file, options);
 

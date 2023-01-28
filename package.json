@@ -1,6 +1,6 @@
 {
   "name": "agheri-fatture",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A simple Electron application to generate invoices",
   "main": "build/main/main.js",
   "scripts": {
@@ -27,12 +27,15 @@
     "vite": "^3.0.9"
   },
   "dependencies": {
-    "request": "^2.88.2",
+    "@popperjs/core": "^2.11.6",
     "bootstrap": "^5.2.1",
     "docx": "^7.5.0",
     "ejs": "^3.1.8",
     "electron-json-config": "^2.0.0",
-    "html-pdf-node": "^1.0.8",
+    "handlebars": "^4.7.7",
+    "inline-css": "^4.0.1",
+    "puppeteer": "^19.6.2",
+    "request": "^2.88.2",
     "sass": "^1.55.0",
     "sass-loader": "^13.0.2",
     "sequelize": "^6.23.1",
@@ -42,9 +45,53 @@
     "vue-toastification": "^2.0.0-rc.5"
   },
   "build": {
+    "appId": "com.electron.app",
+    "directories": {
+      "output": "dist"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "shortcutName": "Fatture"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": [
+        "snap"
+      ]
+    },
     "files": [
-      "./build/**/*",
-      "package.json"
+      "build/main/**/*",
+      {
+        "from": "build/renderer",
+        "to": "renderer",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
+        "from": "src/main/static",
+        "to": "static",
+        "filter": [
+          "**/*"
+        ]
+      },
+      "!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
+      "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
+      "!**/node_modules/*.d.ts",
+      "!**/node_modules/.bin",
+      "!src",
+      "!config",
+      "!README.md",
+      "!scripts",
+      "!build/renderer",
+      "!dist"
+    ],
+    "extraResources": [
+      "./resources/**"
     ]
   }
 }

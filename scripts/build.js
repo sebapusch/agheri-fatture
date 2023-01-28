@@ -1,6 +1,5 @@
 const Path = require('path');
 const Chalk = require('chalk');
-const FileSystem = require('fs');
 const Vite = require('vite');
 const compileTs = require('./private/tsc');
 

@@ -67,18 +67,15 @@ function restartElectron() {
     }
 }
 
-function copyStaticFiles() {
-    copy('static');
-}
-
-/*
-The working dir of Electron is build/main instead of src/main because of TS.
-tsc does not copy static files, so copy them over manually for dev server.
-*/
-function copy(path) {
+function copyResource() {
     FileSystem.cpSync(
-        Path.join(__dirname, '..', 'src', 'main', path),
-        Path.join(__dirname, '..', 'build', 'main', path),
+        Path.join(__dirname, '..', 'src', 'main', 'static'),
+        Path.join(__dirname, '..', 'build', 'main', 'static'),
+        { recursive: true }
+    );
+    FileSystem.cpSync(
+        Path.join(__dirname, '..', 'resources'),
+        Path.join(__dirname, '..', 'build', 'resources'),
         { recursive: true }
     );
 }
@@ -96,7 +93,7 @@ async function start() {
     const devServer = await startRenderer();
     rendererPort = devServer.config.server.port;
 
-    copyStaticFiles();
+    copyResource();
     startElectron();
 
     const path = Path.join(__dirname, '..', 'src', 'main');
@@ -106,7 +103,7 @@ async function start() {
         console.log(Chalk.blueBright(`[electron] `) + `Change in ${path}. reloading... 🚀`);
 
         if (path.startsWith(Path.join('static', '/'))) {
-            copy(path);
+            copyResource();
         }
 
         restartElectron();

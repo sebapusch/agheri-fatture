@@ -1,5 +1,5 @@
-import InvoicePDF from '../invoice/pdf/Invoice';
-import { Model, ModelStatic, Op, Sequelize } from 'sequelize';
+import InvoicePDF from '../invoice/pdf';
+import { Model, ModelStatic } from 'sequelize';
 import { Controller, ListOptions, ListResponse } from './Controller';
 import { ServiceTypes } from '../sequelize/models/Service';
 import { Nations } from '../sequelize/models/Invoice';

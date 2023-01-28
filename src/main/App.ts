@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, IpcMainEvent, session, WebContents, WebFrameMain } from "electron";
+import { app, BrowserWindow, ipcMain, IpcMainEvent, session, WebContents } from "electron";
 import { Sequelize } from "sequelize";
 import initSequelize from './sequelize';
 import { Controller } from "./controller/Controller";
@@ -9,6 +9,7 @@ import Config from "electron-json-config/lib/Config";
 
 export type AppSettings = {
     configFilePath: string,
+    databasePath: string,
     window: {
       preloadPath: string,
       env: string,
@@ -49,7 +50,7 @@ export default class App {
 
     ready: boolean = false;
     settings: AppSettings;
-    
+
     config: Config;
     electron: Electron.App;
     sequelize!: Sequelize;
@@ -66,9 +67,7 @@ export default class App {
     public async run() {
       await this.electron.whenReady();
 
-      const sequelize = await initSequelize();
-
-      this.sequelize = sequelize;
+      this.sequelize = await initSequelize(this.settings.databasePath);
       this.controllers = controllers.map(C => new C(this));
       this.mainWindow = this.createWindow(this.settings.window);
 
@@ -85,7 +84,7 @@ export default class App {
         this.electron.quit();
       });
 
-      this.registerConfigHandlers();
+      await this.registerConfigHandlers();
 
       this.ready = true;
     }
@@ -93,41 +92,30 @@ export default class App {
     public handle(event: string, handler: Function) {
 
       console.log(event)
-  
+
       const response: Response = {
         success: true,
         content: null,
         channel: event,
       }
-  
+
       ipcMain.on(event, async (e: IpcMainEvent, ...args) => {
         try {
-  
-          this.validateSender(e.senderFrame);
-  
           response.content = await handler(...args);
           response.success = true;
-  
+
           this.respond(e.sender, response);
-  
+
         } catch (error) {
-  
+
           console.log(error);
-  
+
           response.content = error;
           response.success = false;
           this.respond(e.sender, response);
         }
       });
-  
-    }
 
-    private validateSender(frame: WebFrameMain) {
-      const senderUrl = new URL(frame.url);
-  
-      if (false === ['electronjs.org', 'localhost:8080'].includes(senderUrl.host)) {
-        throw new Error('Errore di sicurezza');
-      }
     }
 
     private respond(sender: WebContents, response: Response)
@@ -145,12 +133,12 @@ export default class App {
             contextIsolation: true,
           },
         });
-        
+
         if (settings.env === 'dev') {
-          
+
           mainWindow.loadURL(settings.url);
         } else {
-          
+
           mainWindow.loadFile(settings.indexFilePath);
         }
 

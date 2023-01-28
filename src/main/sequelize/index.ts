@@ -5,8 +5,7 @@ import { modelDefiner as service } from './models/Service';
 import client from './models/Client';
 import { join } from 'path';
 import init from './init';
-
-const DB_PATH = join(__dirname, 'database/agheri.sqlite');
+import { dirname } from 'path';
 
 const modelDefiners = [
 	invoice,
@@ -14,14 +13,16 @@ const modelDefiners = [
 	client,
 ];
 
-const sequelize = new Sequelize({
-	dialect: 'sqlite',
-	storage: DB_PATH,
-	logQueryParameters: true,
-	benchmark: true,
-});
+async function register(databasePath: string): Promise<Sequelize> {
 
-async function register(): Promise<Sequelize> {
+  console.error(dirname(databasePath));
+  const sequelize = new Sequelize({
+    dialect: 'sqlite',
+    storage: databasePath,
+    logQueryParameters: true,
+    benchmark: true,
+  });
+
 
   await init(sequelize);
   
