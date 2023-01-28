@@ -1,6 +1,7 @@
 const Path = require('path');
 const Chalk = require('chalk');
 const Vite = require('vite');
+const FileSystem = require('fs');
 const compileTs = require('./private/tsc');
 
 function buildRenderer() {
@@ -16,6 +17,14 @@ function buildMain() {
     return compileTs(mainPath);
 }
 
+function copyIcon() {
+    FileSystem.cp(
+      Path.join(__dirname, '..', 'icon.png'),
+      Path.join(__dirname, '..', 'build', 'icon.png'),
+      () => {},
+    );
+}
+
 FileSystem.rmSync(Path.join(__dirname, '..', 'build'), {
     recursive: true,
     force: true,
@@ -23,6 +32,7 @@ FileSystem.rmSync(Path.join(__dirname, '..', 'build'), {
 
 console.log(Chalk.blueBright('Transpiling renderer & main...'));
 
+copyIcon();
 Promise.allSettled([
     buildRenderer(),
     buildMain(),
