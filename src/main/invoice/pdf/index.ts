@@ -217,7 +217,7 @@ export default class InvoicePDF {
       currency = Currency.EUR
     }
 
-    return `${currency} ${price}`;
+    return `${currency} ${price.toFixed(2)}`;
   }
 
   private serviceTypeTrans(type: string|null): string {

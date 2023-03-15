@@ -130,10 +130,10 @@
           </div>
         </div>
 
-        <table class="table table-bordered rounded">
+        <table class="table table-bordered rounded table-fixed">
           <thead>
             <tr>
-              <th>Nome servizio</th>
+              <th width="45%">Nome servizio</th>
               <th>Tipo servizio</th>
               <th>Ore/Righe</th>
               <th> {{ servicePriceLabel }} </th>

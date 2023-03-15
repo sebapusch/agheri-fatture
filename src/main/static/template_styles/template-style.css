@@ -27,13 +27,18 @@ h3 {
   padding: 20px;
 }
 #service-table {
-  width: -webkit-fill-available;
+  table-layout: fixed;
+  width: 100%;
   margin: auto;
   border-collapse: collapse;
 }
 
 #service-table * {
   border: 1px solid #ddd;
+}
+
+#service-table td {
+  word-break: break-all;
 }
 
 #service-table tr:nth-child(even) {
