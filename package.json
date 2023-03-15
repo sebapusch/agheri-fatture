@@ -38,8 +38,8 @@
     "request": "^2.88.2",
     "sass": "^1.55.0",
     "sass-loader": "^13.0.2",
-    "sequelize": "^6.23.1",
-    "sqlite3": "^5.1.1",
+    "sequelize": "^6.29.3",
+    "sqlite3": "^5.1.6",
     "vue": "^3.2.36",
     "vue-multiselect": "^3.0.0-alpha.2",
     "vue-toastification": "^2.0.0-rc.5"
