@@ -4,7 +4,7 @@ import { readFile } from 'fs/promises';
 import { Nations } from '../../sequelize/models/Invoice';
 import { createWriteStream, readFileSync } from 'original-fs';
 import { ServiceTypes } from '../../sequelize/models/Service';
-import { application, staticPath } from '../../main';
+import { application, resourcePath, staticPath } from '../../main';
 import { generatePdf } from './htmlToPdf';
 import type { PaperFormat } from 'puppeteer';
 enum Currency {
@@ -187,7 +187,7 @@ export default class InvoicePDF {
 
     invoice.totalAmount = this.currencyPrice(totalAmount);
 
-    invoice.base64logo = readFileSync('/home/sebastianp/code/personal/agheri-fatture/resources/logo.jpg').toString('base64');
+    invoice.base64logo = readFileSync(join(resourcePath, 'logo.jpg')).toString('base64');
 
     return invoice;
   }
