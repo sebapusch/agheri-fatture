@@ -2,7 +2,7 @@ import { join, normalize } from 'path';
 import ejs from 'ejs';
 import { readFile } from 'fs/promises';
 import { Nations } from '../../sequelize/models/Invoice';
-import { createWriteStream } from 'original-fs';
+import { createWriteStream, readFileSync } from 'original-fs';
 import { ServiceTypes } from '../../sequelize/models/Service';
 import { application, staticPath } from '../../main';
 import { generatePdf } from './htmlToPdf';
@@ -21,6 +21,7 @@ type RenderOptions = {
 type RenderableInvoice = {
   totalAmount: string,
   totalAmountEur: string|null,
+  base64logo: string,
   date: string,
   code: string,
   client: {
@@ -96,6 +97,7 @@ export default class InvoicePDF {
           code: this.invoice.code,
         },
         style,
+        base64logo: this.invoice.base64logo,
       };
 
       ejs.renderFile(templatePath, data, (err, str) => {
@@ -184,6 +186,8 @@ export default class InvoicePDF {
     }
 
     invoice.totalAmount = this.currencyPrice(totalAmount);
+
+    invoice.base64logo = readFileSync('/home/sebastianp/code/personal/agheri-fatture/resources/logo.jpg').toString('base64');
 
     return invoice;
   }
