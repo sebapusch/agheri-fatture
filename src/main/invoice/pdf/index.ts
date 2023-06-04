@@ -9,7 +9,7 @@ import { generatePdf } from './htmlToPdf';
 import type { PaperFormat } from 'puppeteer';
 enum Currency {
   EUR = '€',
-  CHF = 'chf',
+  CHF = 'CHF',
 }
 
 type RenderOptions = {
