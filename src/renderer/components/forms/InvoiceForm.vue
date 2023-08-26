@@ -510,6 +510,11 @@ export default {
       return this.form.nation === 'CH';
     }
   },
+
+  beforeMount() {
+    this.handleClientSearch('');
+  }
+  
 }
 
 </script>
