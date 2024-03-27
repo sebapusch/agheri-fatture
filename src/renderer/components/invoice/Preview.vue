@@ -47,15 +47,19 @@ export default {
 
   methods: {
     async refresh() {
-      console.log(this.invoice);
       if (! this.invoice) {
         return;
       }
       const invoice = JSON.parse(JSON.stringify(this.invoice));
 
-      this.preview = typeof invoice === 'string'
-        ? await invoiceApi.previewFromId(this.invoice)
-        : await invoiceApi.preview(invoice);
+      if (typeof invoice === 'string') {
+        this.preview = await invoiceApi.previewFromId(this.invoice)
+      } else {
+        if (invoice.clientId && typeof invoice.clientId === 'object') {
+          invoice.clientId = invoice.clientId.id;
+        }
+        this.preview = await invoiceApi.preview(invoice);
+      }
     },
     toggle() {
       this.$nextTick(() => {

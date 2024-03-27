@@ -8,7 +8,7 @@ import { application, resourcePath, staticPath } from '../../main';
 import { generatePdf } from './htmlToPdf';
 import type { PaperFormat } from 'puppeteer';
 enum Currency {
-  EUR = '€',
+  EUR = 'EUR',
   CHF = 'CHF',
 }
 

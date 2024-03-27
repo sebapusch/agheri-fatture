@@ -7,7 +7,7 @@ import request from 'request';
 import { dialog, shell } from 'electron';
 import App from '../App';
 
-const exchangeRateUri = 'https://api.exchangerate.host/latest?base=CHF&symbols=EUR';
+const exchangeRateUri = 'https://data-api.ecb.europa.eu/service/data/EXR/D.CHF.EUR.SP00.A?format=jsondata&startPeriod={startPeriod}';
 const serviceTypes = [...Object.values(ServiceTypes)] as const;
 
 type Service = {
@@ -42,7 +42,6 @@ export default class InvoiceController extends Controller {
   }
 
   private async preview(invoice: any) {
-
     if (invoice.clientId) {
       const { client } = this.sequelize.models;
       const invoiceClient = await client.findByPk(invoice.clientId);
@@ -67,13 +66,23 @@ export default class InvoiceController extends Controller {
 
   protected async getChfExchangeRage(): Promise<number>
   {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const startPeriod = yesterday.toISOString().split('T')[0];
+    const uri = exchangeRateUri.replace('{startPeriod}', startPeriod);
+    
     return new Promise((resolve, reject) => {
 
-      request(exchangeRateUri, { json: true }, (err, _, body: any) => {
+      request(uri, { json: true }, (err, _, body: any) => {
         if (err) {
           reject(err);
         } else {
-          resolve(body.rates.EUR.toFixed(2) ?? null);
+          
+          const series = Object.values(body.dataSets[0].series) as any[];
+          const eurToChf = series[0].observations['0'][0];
+          const chfToEur = (1 / eurToChf).toFixed(2);
+
+          resolve(Number(chfToEur));
         }
       });
     });

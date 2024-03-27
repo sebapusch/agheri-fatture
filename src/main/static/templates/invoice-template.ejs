@@ -43,8 +43,12 @@
       
       <div class="col" style="padding-left: 200px;">
         <b>An:</b><br>
-        <%= client.name  %><br>
-        <%= client.holder %><br>
+        <% if (client.name) { %>
+          <%= client.name  %><br>
+        <% } %>
+        <% if (client.holder) { %>
+          <%= client.holder %><br>
+        <% } %>
         <%= client.address %><br>
         <%= client.zipcode %>, <%= client.city %>, <%= client.state %><br>
         <%= client.piva %><br>
