@@ -125,6 +125,7 @@ export default class App {
 
     private createWindow(settings: AppSettings['window']) {
         const mainWindow = new BrowserWindow({
+          title: 'Fatture',
           width: 800,
           height: 600,
           webPreferences: {

@@ -200,11 +200,13 @@ export default class InvoiceController extends Controller {
       return;
     }
 
-    const pdf = new InvoicePDF(invoice);
+    try {
+      await (new InvoicePDF(invoice)).save(filePath);
+    } catch (e) {
+      throw new Error(`Errore durante il salvataggio del file: ${e}`);
+    }
     
-    await pdf.save(filePath);
-    shell.openPath(filePath);
 
-    return;
+    shell.openPath(filePath);
   }
 }

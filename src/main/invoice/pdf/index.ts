@@ -60,7 +60,7 @@ export default class InvoicePDF {
     return readFile(templateStylePath);
   }
 
-  public async save(target: string): Promise<boolean>
+  public async save(target: string): Promise<void>
   {
     const file = {
       content: await this.render(),
@@ -76,7 +76,21 @@ export default class InvoicePDF {
 
     const pdf: Buffer = await generatePdf(file, options);
 
-    return createWriteStream(target).write(pdf);
+    const res = await new Promise((resolve, reject) => {
+      const wStream = createWriteStream(target);
+      wStream.write(pdf, (err: Error | undefined | null) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(null);
+        }
+      });
+      wStream.close();
+     });
+
+     if (res instanceof Error) {
+       throw res;
+     }
   }
   
   public async render(): Promise<string> {
