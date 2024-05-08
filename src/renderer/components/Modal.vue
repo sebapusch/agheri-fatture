@@ -3,9 +3,9 @@
     <div class="modal-dialog modal-dialog-centered" :class="{'modal-lg': large}">
       <div class="modal-content">
 
-        <div class="modal-header" v-if="header">
+        <div class="modal-header d-flex justify-content-between" v-if="header">
           <h5 class="modal-title">{{ title }}</h5>
-          <button type="button" class="btn btn-primary" @click="hide">
+          <button type="button" class="btn btn-outline-dark border-0" @click="hide">
             <span class="material-icons align-middle">close</span>
           </button>
         </div>

@@ -133,7 +133,7 @@
         <table class="table table-bordered rounded table-fixed">
           <thead>
             <tr>
-              <th width="45%">Nome servizio</th>
+              <th width="35%">Nome servizio</th>
               <th>Tipo servizio</th>
               <th>Ore/Righe</th>
               <th> {{ servicePriceLabel }} </th>
@@ -150,6 +150,9 @@
               <td class="ps-2"> {{ service.quantity ?? '-' }} </td>
               <td class="ps-2"> {{ service.price }} </td>
               <td class="text-center">
+                <button class="icon-btn icon-btn-success" @click="duplicateService(i)">
+                  <span class="material-icons align-middle">repeat</span>
+                </button>
                 <button class="icon-btn icon-btn-danger" @click="removeService(i)">
                   <span class="material-icons align-middle">delete</span>
                 </button>
@@ -443,6 +446,11 @@ export default {
 
     removeService(index) {
       this.form.services.splice(index, 1);
+    },
+
+    duplicateService(index) {
+      this.service = JSON.parse(JSON.stringify(this.form.services[index]));
+      this.$refs.addServiceModal.show();
     },
 
     resetServiceForm() {
