@@ -137,7 +137,7 @@
               <th>Tipo servizio</th>
               <th>Ore/Righe</th>
               <th> {{ servicePriceLabel }} </th>
-              <th style="width: 8%;"></th>
+              <th style="width: 15%;"></th>
             </tr>
           
           </thead>
@@ -152,6 +152,9 @@
               <td class="text-center">
                 <button class="icon-btn icon-btn-success" @click="duplicateService(i)">
                   <span class="material-icons align-middle">repeat</span>
+                </button>
+                <button class="icon-btn icon-btn-primary" @click="updateService(i)">
+                  <span class="material-icons align-middle">edit</span>
                 </button>
                 <button class="icon-btn icon-btn-danger" @click="removeService(i)">
                   <span class="material-icons align-middle">delete</span>
@@ -309,9 +312,12 @@ export default {
   },
 
   data() {
+    const model = JSON.parse(JSON.stringify(this.modelValue))
+    model.date = model.date ? model.date.split('T')[0] : null;
     return {
-      form: JSON.parse(JSON.stringify(this.modelValue)),
+      form: model,
       clients: this.client ? [this.client] : [],
+      updateServiceIndex: null,
       service: {
         name: null,
         type: 'flat',
@@ -363,7 +369,6 @@ export default {
     form: {
       deep: true,
       handler(value, old) {
-
         const invoice = JSON.parse(JSON.stringify(value));
 
         if (value.clientId) {
@@ -405,8 +410,13 @@ export default {
       if (!this.serviceQuantityEnabled) {
         this.service.quantity = null;
       }
-
-      this.form.services.push(this.service);
+      
+      if (this.updateServiceIndex !== null) {
+        this.form.services[this.updateServiceIndex] = this.service;
+        this.updateServiceIndex = null;
+      } else {
+        this.form.services.push(this.service);
+      }
 
       this.$refs.addServiceModal.hide();
       this.resetServiceForm();
@@ -450,6 +460,12 @@ export default {
 
     duplicateService(index) {
       this.service = JSON.parse(JSON.stringify(this.form.services[index]));
+      this.$refs.addServiceModal.show();
+    },
+
+    updateService(index) {
+      this.service = JSON.parse(JSON.stringify(this.form.services[index]));
+      this.updateServiceIndex = index;
       this.$refs.addServiceModal.show();
     },
 

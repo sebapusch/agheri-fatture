@@ -99,6 +99,7 @@ const api = [
       'save',
       'delete',
       'progressNum',
+      'update'
     ]
   },
   {

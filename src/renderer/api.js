@@ -15,6 +15,7 @@ const invoice = {
   save: async (id) => await window.bridge.saveInvoice(id),
   delete: async (id) => await window.bridge.deleteInvoice(id),
   progressNum: async () => await window.bridge.progressNumInvoice(),
+  update: async (id, data) => await window.bridge.updateInvoice(id, data),
 };
 
 const config = {

@@ -1,6 +1,6 @@
 <template>
   <div 
-      class="offcanvas top-50 start-50 translate-middle border border-dark" 
+      class="offcanvas bottom-0 start-50 translate-middle border border-dark" 
       tabindex="-1" 
       id="preview-offcanvas"
       ref="previewOffcanvas"

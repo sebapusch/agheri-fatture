@@ -25,12 +25,18 @@
         >
           <span class="material-icons align-middle">file_download</span>
         </button>
+        <button
+          class="icon-btn icon-btn-primary"
+          @click="handleUpdate(id)"
+        >
+          <span class="material-icons align-middle">edit</span>
+        </button>
 
         <button
           class="icon-btn icon-btn-success"
           @click="handleAdd(id)"
         >
-          <span class="material-icons align-middle">add_circle</span>
+          <span class="material-icons align-middle">repeat</span>
         </button>
       </template>
     </DataTable>
@@ -69,7 +75,6 @@ import DataTable from '../DataTable.vue';
 import InvoicePreview from '../invoice/Preview.vue';
 import { invoice as invoiceApi } from '../../api';
 import { useToast } from 'vue-toastification';
-import { Tooltip } from 'bootstrap';
 import Modal from '../Modal.vue';
 
 const tableDefinition = [{
@@ -106,7 +111,7 @@ export default {
       invoicePreview: null,
       deleteInvoice: null,
       tableDefinition,
-      actions: ["delete", "search"],
+      actions: ["delete", "search", "update"],
       table: {
         total: 0,
         limit: 10,
@@ -127,6 +132,10 @@ export default {
   },
 
   methods: {
+    async handleUpdate(id) {
+      const initialInvoice = await invoiceApi.find(id);
+      this.$parent.selectPage('invoiceAdd', { initialInvoice, update: true });
+    },
     async list(searchTerm) {
       const options = {
         limit: this.table.limit,

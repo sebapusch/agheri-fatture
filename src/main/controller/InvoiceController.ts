@@ -38,7 +38,8 @@ export default class InvoiceController extends Controller {
     this.app.handle('invoice.previewFromId', async (id: string) => this.previewFromId(id));
     this.app.handle('invoice.exchangeRate', this.getChfExchangeRage);
     this.app.handle('invoice.delete', (id: string) => this.delete(id));
-    this.app.handle('invoice.progressNum', async () => this.getProgressNum());
+    this.app.handle('invoice.progressNum', async () => this.getProgressNum())
+    this.app.handle('invoice.update', async (id: string, values: any) => this.update(id, values));
   }
 
   private async preview(invoice: any) {
@@ -101,6 +102,19 @@ export default class InvoiceController extends Controller {
     this.updateProgressNum(values.code);
 
     return created.get();
+  }
+
+  protected async update(id: string, values: any) {
+    const { service } = this.sequelize.models;
+    await service.destroy({ where: { invoiceId: id }});
+    values = await this.prepare(values);
+    const updated = await this.model.update(values, {
+      where: { id },
+    });
+    await service.bulkCreate(
+      values.services.map(
+        (service: any) => ({invoiceId: id, ...service})));
+    return updated[0] > 0;
   }
 
   protected async list(options: ListOptions): Promise<ListResponse> {

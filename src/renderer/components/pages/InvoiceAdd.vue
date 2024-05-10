@@ -57,12 +57,19 @@ export default {
       type: Object,
       required: false,
       default: null,
+    },
+    update: {
+      type: Boolean,
+      required: false,
+      default: false,
     }
   },
 
   data() {
     let invoice = null;
     let initialClient = null;
+
+    console.log(this.initialInvoice);
 
     if (this.initialInvoice) {
       initialClient = this.initialInvoice.client;
@@ -72,7 +79,7 @@ export default {
         nation: this.initialInvoice.nation,
         displayEuro: this.initialInvoice.displayEuro,
         exchangeRate: this.initialInvoice.exchangeRate,
-        date: this.initialInvoice.date,
+        date: new Date(this.initialInvoice.date),
         services: this.initialInvoice.services.map(
           ({ type, name, quantity, price }) => ({ type, name, quantity, price })
         ),
@@ -85,7 +92,7 @@ export default {
         nation: 'DE',
         displayEuro: false,
         exchangeRate: null,
-        date: null,
+        date: new Date(),
         services: [],
       };
     }
@@ -110,9 +117,14 @@ export default {
   methods: {
     async handleInvoiceSubmit() {
       try {
-        await invoiceApi.store(this.invoiceData);
+        if (this.update) {
+          await invoiceApi.update(this.initialInvoice.id, this.invoiceData);
+        } else {
+          await invoiceApi.store(this.invoiceData);
+        }
       } catch(e) {
-        this.toast.error(e);
+        console.log(e.message);
+        this.toast.error(e.message);
         return;
       }
       
