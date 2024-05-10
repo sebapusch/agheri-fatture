@@ -1,6 +1,6 @@
 <template>
   <div 
-      class="offcanvas bottom-0 start-50 translate-middle border border-dark" 
+      class="offcanvas start-50 border border-dark" 
       tabindex="-1" 
       id="preview-offcanvas"
       ref="previewOffcanvas"
@@ -93,11 +93,15 @@ export default {
   }
 
   #preview-offcanvas {
+    top: 0;
+    bottom: 0;
     width: auto;
     height: fit-content;
-    max-height: 800px;
+    max-height: 100%;
+    max-width: 90%;
     overflow-x: scroll;
     align-self: center;
     transition: none;
+    transform: translate(-50%) !important;
   }
 </style>
