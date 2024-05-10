@@ -7,6 +7,7 @@ import { ServiceTypes } from '../../sequelize/models/Service';
 import { application, resourcePath, staticPath } from '../../main';
 import { generatePdf } from './htmlToPdf';
 import type { PaperFormat } from 'puppeteer';
+import { AppConfig, Billing } from '../../App';
 enum Currency {
   EUR = 'EUR',
   CHF = 'CHF',
@@ -16,6 +17,7 @@ type RenderOptions = {
   currency: Currency,
   displayEur: boolean,
   exchangeRate: number,
+  billing: Billing,
 };
 
 type RenderableInvoice = {
@@ -101,6 +103,7 @@ export default class InvoicePDF {
 
       const data = {
         profile: application.config.get('profile'),
+        billing: this.renderOptions.billing,
         client: this.invoice.client,
         services: this.invoice.services,
         options: this.renderOptions,
@@ -126,11 +129,13 @@ export default class InvoicePDF {
   }
 
   private setOptions(data: any): RenderOptions {
+    const profile = application.config.get('profile') as AppConfig['profile'];
     const renderOptions = {
       currency: Currency.EUR,
       displayEur: false,
       exchangeRate: 0,
       message: '',
+      billing: profile.billing,
     }
 
     let message_key = 'message_de';
@@ -144,6 +149,8 @@ export default class InvoicePDF {
         renderOptions.exchangeRate = typeof data.exchangeRate === 'number'
           ? data.exchangeRate
           : 1;
+      } else {
+        renderOptions.billing = profile.billing_ch;
       }
 
       message_key = 'message_ch';

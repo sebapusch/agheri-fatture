@@ -18,20 +18,24 @@ export type AppSettings = {
     },
 };
 
-type AppConfig = {
+export type Billing = {
+  name: string,
+  bank: string,
+  iban: string,
+  bic: string,
+};
+
+export type AppConfig = {
   progress_num: number,
+  chromium_executable: string,
   profile: {
     name: string,
     title: string,
     address: Array<string>,
     piva: string,
     wesite: string,
-    billing: {
-      name: string,
-      bank: string,
-      iban: string,
-      bic: string,
-    },
+    billing: Billing,
+    billing_ch: Billing,
   }
 };
 

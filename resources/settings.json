@@ -15,6 +15,12 @@
             "bank": "Fineco",
             "iban": "IT26E0301503200000003227183",
             "bic": "FEBIITM1XXX"
+        },
+        "billing_ch": {
+            "name": "Alessandra Gheri",
+            "bank": "Fineco",
+            "iban": "IT26E0301503200000003227183",
+            "bic": "FEBIITM1XXX"
         }
     },
     "message_de": "Mehrwertsteuer wird nicht berechnet auf Grundlage der italienischen Gesetzgebung, art. 7-ter des Gesetzes DPR 633/72",
