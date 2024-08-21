@@ -38,11 +38,11 @@ h3 {
 }
 
 #service-table td {
-  word-break: break-all;
+  word-break: break-word;
 }
 
 #service-table tr:nth-child(even) {
-  background-color: #f2f2f2 !important
+  background-color: #f2f2f2 !important;
 }
 
 #message {
@@ -55,9 +55,8 @@ h3 {
   border: 0 !important;
 }
 
-.no-border-row>td {
+.no-border-row > td {
   border: 0 !important;
-  ;
 }
 
 .force-border {
