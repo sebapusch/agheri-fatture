@@ -1,51 +1,53 @@
-import { join, normalize } from 'path';
-import ejs from 'ejs';
-import { readFile } from 'fs/promises';
-import { Nations } from '../../sequelize/models/Invoice';
-import { createWriteStream, readFileSync } from 'original-fs';
-import { ServiceTypes } from '../../sequelize/models/Service';
-import { application, resourcePath, staticPath } from '../../main';
-import { generatePdf } from './htmlToPdf';
-import type { PaperFormat } from 'puppeteer';
-import { AppConfig, Billing } from '../../App';
+import { join, normalize } from "path";
+import ejs from "ejs";
+import { readFile } from "fs/promises";
+import { Nations } from "../../sequelize/models/Invoice";
+import { createWriteStream, readFileSync } from "original-fs";
+import { ServiceTypes } from "../../sequelize/models/Service";
+import { application, resourcePath, staticPath } from "../../main";
+import { generatePdf } from "./htmlToPdf";
+import type { PaperFormat } from "puppeteer";
+import { AppConfig, Billing } from "../../App";
 enum Currency {
-  EUR = 'EUR',
-  CHF = 'CHF',
+  EUR = "EUR",
+  CHF = "CHF",
 }
 
 type RenderOptions = {
-  currency: Currency,
-  displayEur: boolean,
-  exchangeRate: number,
-  billing: Billing,
+  currency: Currency;
+  displayEur: boolean;
+  exchangeRate: number;
+  billing: Billing;
 };
 
 type RenderableInvoice = {
-  totalAmount: string,
-  totalAmountEur: string|null,
-  base64logo: string,
-  date: string,
-  code: string,
+  totalAmount: string;
+  totalAmountEur: string | null;
+  base64logo: string;
+  date: string;
+  code: string;
   client: {
-    name: string,
-    holder: string,
-    piva: string,
-    zipcode: string,
-  },
+    name: string;
+    holder: string;
+    piva: string;
+    zipcode: string;
+  };
   services: Array<{
-    type: string,
-    name: string,
-    quantity: number|string,
-    price: string,
-    priceNum: number,
-    totalAmount: number,
-  }>,
+    type: string;
+    name: string;
+    quantity: number | string;
+    price: string;
+    priceNum: number;
+    totalAmount: number;
+  }>;
 };
 
-const templatePath = join(staticPath, 'templates/invoice-template.ejs');
-const templateStylePath = join(staticPath, 'template_styles/template-style.css');
+const templatePath = join(staticPath, "templates/invoice-template.ejs");
+const templateStylePath = join(
+  staticPath,
+  "template_styles/template-style.css"
+);
 export default class InvoicePDF {
-
   private readonly renderOptions: RenderOptions;
   private readonly chromiumExecutable: string;
   private invoice: RenderableInvoice;
@@ -54,7 +56,7 @@ export default class InvoicePDF {
     this.renderOptions = this.setOptions(data);
     this.invoice = this.setInvoice(data);
     this.chromiumExecutable = normalize(
-        <string>application.config.get('chromium_executable')
+      <string>application.config.get("chromium_executable")
     );
   }
 
@@ -62,16 +64,15 @@ export default class InvoicePDF {
     return readFile(templateStylePath);
   }
 
-  public async save(target: string): Promise<void>
-  {
+  public async save(target: string): Promise<void> {
     const file = {
       content: await this.render(),
-    }
+    };
 
     const options = {
       executablePath: this.chromiumExecutable,
       pdfOptions: {
-        format: <PaperFormat>'a4',
+        format: <PaperFormat>"a4",
         localUrlAccess: true,
       },
     };
@@ -88,21 +89,19 @@ export default class InvoicePDF {
         }
       });
       wStream.close();
-     });
+    });
 
-     if (res instanceof Error) {
-       throw res;
-     }
+    if (res instanceof Error) {
+      throw res;
+    }
   }
-  
-  public async render(): Promise<string> {
 
+  public async render(): Promise<string> {
     const style = (await this.style()).toString();
 
     return new Promise((resolve, reject) => {
-
       const data = {
-        profile: application.config.get('profile'),
+        profile: application.config.get("profile"),
         billing: this.renderOptions.billing,
         client: this.invoice.client,
         services: this.invoice.services,
@@ -118,7 +117,6 @@ export default class InvoicePDF {
       };
 
       ejs.renderFile(templatePath, data, (err, str) => {
-
         if (err) {
           reject(err);
         }
@@ -129,31 +127,29 @@ export default class InvoicePDF {
   }
 
   private setOptions(data: any): RenderOptions {
-    const profile = application.config.get('profile') as AppConfig['profile'];
+    const profile = application.config.get("profile") as AppConfig["profile"];
     const renderOptions = {
       currency: Currency.EUR,
       displayEur: false,
       exchangeRate: 0,
-      message: '',
+      message: "",
       billing: profile.billing,
-    }
+    };
 
-    let message_key = 'message_de';
+    let message_key = "message_de";
 
     if (data.nation && data.nation === Nations.CH) {
       renderOptions.currency = Currency.CHF;
       renderOptions.displayEur = data.displayEuro ?? false;
-      
-      if (renderOptions.displayEur) {
 
-        renderOptions.exchangeRate = typeof data.exchangeRate === 'number'
-          ? data.exchangeRate
-          : 1;
+      if (renderOptions.displayEur) {
+        renderOptions.exchangeRate =
+          typeof data.exchangeRate === "number" ? data.exchangeRate : 1;
       } else {
         renderOptions.billing = profile.billing_ch;
       }
 
-      message_key = 'message_ch';
+      message_key = "message_ch";
     }
 
     renderOptions.message = application.config.get(message_key) as string;
@@ -165,30 +161,29 @@ export default class InvoicePDF {
     const invoice: any = {};
 
     if (data.date instanceof Date) {
-      invoice.date = data.date.toLocaleDateString('it-IT');
+      invoice.date = data.date.toLocaleDateString("it-IT");
     } else {
-      invoice.date = (new Date).toLocaleDateString('it-IT');
+      invoice.date = new Date().toLocaleDateString("it-IT");
     }
 
-    invoice.code = data.code ?? '-'
+    invoice.code = data.code ?? "-";
 
     invoice.client = {
-      holder: data.client?.holder ?? '-',
-      name: data.client?.name ?? '-',
-      address: data.client?.address ?? '-',
+      holder: data.client?.holder ?? "-",
+      name: data.client?.name ?? "-",
+      address: data.client?.address ?? "-",
       city: data.client?.city,
       state: this.stateTrans(data.client?.state),
-      zipcode: data.client?.zipcode ?? '-',
-      piva: data.client?.piva ?? '-',
+      zipcode: data.client?.zipcode ?? "-",
+      piva: data.client?.piva ?? "-",
     };
 
     invoice.services = [];
 
     if (data.services && Array.isArray(data.services)) {
-
       invoice.services = data.services.map((service) => ({
-        name: service.name ?? '-',
-        quantity: service.quantity ?? '-',
+        name: service.name ?? "-",
+        quantity: service.quantity ?? "-",
         price: this.currencyPrice(service.price ?? 0),
         priceNum: service.price ?? 0,
         type: this.serviceTypeTrans(service.type),
@@ -198,7 +193,7 @@ export default class InvoicePDF {
 
     let totalAmount = 0;
 
-    if (typeof (data.totalAmount ?? null) === 'number') {
+    if (typeof (data.totalAmount ?? null) === "number") {
       totalAmount = data.totalAmount;
     }
 
@@ -208,14 +203,15 @@ export default class InvoicePDF {
 
     invoice.totalAmount = this.currencyPrice(totalAmount);
 
-    invoice.base64logo = readFileSync(join(resourcePath, 'logo.jpg')).toString('base64');
+    invoice.base64logo = readFileSync(join(resourcePath, "logo.jpg")).toString(
+      "base64"
+    );
 
     return invoice;
   }
 
   private prepareServiceTotalAmount(service: any): string {
     if (!service || !service.price) {
-      
       return this.currencyPrice(0);
     }
 
@@ -224,8 +220,8 @@ export default class InvoicePDF {
     }
 
     if (
-      !service.quantity || 
-      !service.type || 
+      !service.quantity ||
+      !service.type ||
       [ServiceTypes.FLAT, ServiceTypes.MIN].includes(service.type)
     ) {
       return this.currencyPrice(service.price);
@@ -239,29 +235,37 @@ export default class InvoicePDF {
 
     if (convert) {
       price = price * this.renderOptions.exchangeRate;
-      currency = Currency.EUR
+      currency = Currency.EUR;
     }
 
     return `${currency} ${price.toFixed(2)}`;
   }
 
-  private serviceTypeTrans(type: string|null): string {
-    switch(type) {
-      case ServiceTypes.FLAT: return 'Pauschal';
-      case ServiceTypes.HOUR: return 'Stunde';
-      case ServiceTypes.LINE: return 'Zeile';
-      case ServiceTypes.MIN:  return 'Mindenstpreis';
+  private serviceTypeTrans(type: string | null): string {
+    switch (type) {
+      case ServiceTypes.FLAT:
+        return "Pauschal";
+      case ServiceTypes.HOUR:
+        return "Stunde";
+      case ServiceTypes.LINE:
+        return "Zeile";
+      case ServiceTypes.MIN:
+        return "Mindenstpreis";
+      case ServiceTypes.WORD:
+        return "Wort";
     }
 
-    return '-';
+    return "-";
   }
 
-  private stateTrans(state: string|null): string {
-    switch(state) {
-      case 'DE': return 'Deutschland';
-      case 'CH': return 'Schweiz';
+  private stateTrans(state: string | null): string {
+    switch (state) {
+      case "DE":
+        return "Deutschland";
+      case "CH":
+        return "Schweiz";
     }
 
-    return '-';
+    return "-";
   }
 }

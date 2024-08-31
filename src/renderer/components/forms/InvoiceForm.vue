@@ -1,10 +1,7 @@
 <template>
   <div class="container">
-
     <div class="row mb-3">
-
       <div class="col-12">
-
         <label for="client" class="ms-2">Cliente</label>
         <Multiselect
           id="client"
@@ -22,22 +19,21 @@
           <template v-slot:noResult>Nessun risultato</template>
         </Multiselect>
       </div>
-
     </div>
 
     <div class="row my-4">
       <div class="col-6">
         <div class="input-group">
           <FloatingLabel id="code" label="Codice">
-            <input 
-              type="text" 
-              class="form-control" 
-              id="code" 
+            <input
+              type="text"
+              class="form-control"
+              id="code"
               placeholder="code"
               v-model="form.code"
-            >
+            />
           </FloatingLabel>
-          <button 
+          <button
             class="btn btn-light border"
             @click="getProgressNum"
             :disabled="loading.exchangeRate"
@@ -49,16 +45,13 @@
 
       <div class="col-6">
         <FloatingLabel id="nation" label="Nazione">
-          <select 
+          <select
             id="nation"
             class="form-select"
             placeholder="nation"
             v-model="form.nation"
           >
-            <option 
-              v-for="{ label, value } in nations"
-              :value="value"
-            >
+            <option v-for="{ label, value } in nations" :value="value">
               {{ label }}
             </option>
           </select>
@@ -69,24 +62,24 @@
     <div class="row my-4">
       <div class="col-6">
         <FloatingLabel id="date" label="Data">
-          <input 
-              type="date" 
-              class="form-control" 
-              id="date" 
-              placeholder="date"
-              v-model="form.date"
-            >
+          <input
+            type="date"
+            class="form-control"
+            id="date"
+            placeholder="date"
+            v-model="form.date"
+          />
         </FloatingLabel>
       </div>
 
       <div class="col-3 align-self-center align-middle" v-if="nationIsCh">
         <div class="form-check d-flex justify-content-center">
-          <input 
-            class="form-check-input" 
-            type="checkbox" 
+          <input
+            class="form-check-input"
+            type="checkbox"
             id="display-eur"
             v-model="form.displayEuro"
-          >
+          />
           <label class="form-check-label ms-2" for="display-eur">
             Mostra euro
           </label>
@@ -96,15 +89,15 @@
       <div class="col-3" v-if="nationIsCh">
         <div class="input-group">
           <FloatingLabel id="exchange-rate" label="Tasso di cambio">
-            <input 
-              type="number" 
-              class="form-control" 
-              id="exchange-rate" 
+            <input
+              type="number"
+              class="form-control"
+              id="exchange-rate"
               placeholder="exchange-rate"
               v-model="form.exchangeRate"
-            >
+            />
           </FloatingLabel>
-          <button 
+          <button
             class="btn btn-light border"
             @click="getExchangeRate"
             :disabled="loading.exchangeRate"
@@ -116,9 +109,7 @@
     </div>
 
     <div class="row">
-
       <div class="col-12">
-
         <div class="row mb-1">
           <div class="col align-self-center">
             <label class="ms-2">Servizi</label>
@@ -136,27 +127,33 @@
               <th width="35%">Nome servizio</th>
               <th>Tipo servizio</th>
               <th>Ore/Righe</th>
-              <th> {{ servicePriceLabel }} </th>
-              <th style="width: 15%;"></th>
+              <th>{{ servicePriceLabel }}</th>
+              <th style="width: 15%"></th>
             </tr>
-          
           </thead>
           <tbody>
-            <tr
-              v-for="service, i in form.services"
-            >
-              <td class="ps-2"> {{ service.name }} </td>
-              <td class="ps-2"> {{ serviceTypeLabel(service.type) }} </td>
-              <td class="ps-2"> {{ service.quantity ?? '-' }} </td>
-              <td class="ps-2"> {{ service.price }} </td>
+            <tr v-for="(service, i) in form.services">
+              <td class="ps-2">{{ service.name }}</td>
+              <td class="ps-2">{{ serviceTypeLabel(service.type) }}</td>
+              <td class="ps-2">{{ service.quantity ?? "-" }}</td>
+              <td class="ps-2">{{ service.price }}</td>
               <td class="text-center">
-                <button class="icon-btn icon-btn-success" @click="duplicateService(i)">
+                <button
+                  class="icon-btn icon-btn-success"
+                  @click="duplicateService(i)"
+                >
                   <span class="material-icons align-middle">repeat</span>
                 </button>
-                <button class="icon-btn icon-btn-primary" @click="updateService(i)">
+                <button
+                  class="icon-btn icon-btn-primary"
+                  @click="updateService(i)"
+                >
                   <span class="material-icons align-middle">edit</span>
                 </button>
-                <button class="icon-btn icon-btn-danger" @click="removeService(i)">
+                <button
+                  class="icon-btn icon-btn-danger"
+                  @click="removeService(i)"
+                >
                   <span class="material-icons align-middle">delete</span>
                 </button>
               </td>
@@ -167,9 +164,8 @@
     </div>
   </div>
 
-
-  <Modal 
-    modalId="add-service" 
+  <Modal
+    modalId="add-service"
     ref="addServiceModal"
     title="Nuovo servizio"
     large
@@ -177,21 +173,20 @@
     <template v-slot:body>
       <div class="container">
         <div class="row mb-4">
-
           <div class="col-6">
-            <FloatingLabel 
-              id="service-name" 
+            <FloatingLabel
+              id="service-name"
               label="Nome"
               :class="{ 'is-invalid': hasError('serviceName') }"
             >
-              <input 
+              <input
                 type="text"
-                class="form-control" 
+                class="form-control"
                 :class="{ 'is-invalid': hasError('serviceName') }"
-                id="service-name" 
+                id="service-name"
                 placeholder="Nome Servizio"
                 v-model="service.name"
-              >
+              />
             </FloatingLabel>
             <div class="invalid-feedback">
               {{ errors.serviceName }}
@@ -199,16 +194,13 @@
           </div>
           <div class="col-6">
             <FloatingLabel id="service-type" label="Tipo">
-              <select 
+              <select
                 id="service-type"
                 class="form-select"
                 placeholder="Tipo"
                 v-model="service.type"
               >
-                <option 
-                  v-for="{ label, value } in serviceTypes"
-                  :value="value"
-                >
+                <option v-for="{ label, value } in serviceTypes" :value="value">
                   {{ label }}
                 </option>
               </select>
@@ -217,9 +209,7 @@
         </div>
 
         <div class="row">
-
           <div class="col-6">
-
             <FloatingLabel
               id="service-price"
               :label="servicePriceLabel"
@@ -232,18 +222,16 @@
                 :class="{ 'is-invalid': hasError('servicePrice') }"
                 type="number"
                 placeholder="Prezzo"
-              >
+              />
             </FloatingLabel>
             <div class="invalid-feedback">
               {{ errors.servicePrice }}
             </div>
-
           </div>
 
           <div class="col-6">
-
-            <FloatingLabel 
-              id="service-quantity" 
+            <FloatingLabel
+              id="service-quantity"
               :label="serviceQuantityLabel"
               :class="{ 'is-invalid': hasError('serviceQuantity') }"
             >
@@ -255,39 +243,39 @@
                 type="number"
                 placeholder="Quantità"
                 :disabled="!serviceQuantityEnabled"
-              >
+              />
             </FloatingLabel>
             <div class="invalid-feedback">
               {{ errors.serviceQuantity }}
             </div>
-
           </div>
-
         </div>
-
       </div>
     </template>
 
     <template v-slot:footer>
-      <button class="btn btn-light" @click="handleServiceCancel">Annulla</button>
-      <button class="btn btn-primary" @click="handleServiceAdd">Conferma</button>
+      <button class="btn btn-light" @click="handleServiceCancel">
+        Annulla
+      </button>
+      <button class="btn btn-primary" @click="handleServiceAdd">
+        Conferma
+      </button>
     </template>
   </Modal>
 </template>
 
 <script>
-
-import { client as clientApi, invoice as invoiceApi } from '../../api';
-import { gt } from '../../validation';
-import Multiselect from 'vue-multiselect';
-import Modal from '../Modal.vue';
-import FloatingLabel from '../FloatingLabel.vue';
-import { useToast } from 'vue-toastification';
+import { client as clientApi, invoice as invoiceApi } from "../../api";
+import { gt } from "../../validation";
+import Multiselect from "vue-multiselect";
+import Modal from "../Modal.vue";
+import FloatingLabel from "../FloatingLabel.vue";
+import { useToast } from "vue-toastification";
 
 export default {
-  name: 'InvoiceForm',
+  name: "InvoiceForm",
 
-  emits: ['submit', 'update:modelValue'],
+  emits: ["submit", "update:modelValue"],
 
   components: {
     Modal,
@@ -304,7 +292,7 @@ export default {
       type: Object,
       required: false,
       default: null,
-    }
+    },
   },
 
   setup() {
@@ -312,49 +300,61 @@ export default {
   },
 
   data() {
-    const model = JSON.parse(JSON.stringify(this.modelValue))
-    model.date = model.date ? model.date.split('T')[0] : null;
+    const model = JSON.parse(JSON.stringify(this.modelValue));
+    model.date = model.date ? model.date.split("T")[0] : null;
     return {
       form: model,
       clients: this.client ? [this.client] : [],
       updateServiceIndex: null,
       service: {
         name: null,
-        type: 'flat',
+        type: "flat",
         quantity: null,
         price: null,
       },
       errors: {
         service: {
-          name: '',
-          quantity: '',
-          price: '',
-        }
+          name: "",
+          quantity: "",
+          price: "",
+        },
       },
-      serviceTypes: [{
-          label: 'Tasso fisso',
-          value: 'flat',
-        }, {
-          label: 'Orario',
-          value: 'hour',
-        }, {
-          label: 'Riga',
-          value: 'line',
-        }, {
-          label: 'Prezzo minimo',
-          value: 'min',
-      }],
-      nations: [{
-        label: 'Svizzera',
-        value: 'CH',
-      }, {
-        label: 'Germania',
-        value: 'DE',
-      }],
+      serviceTypes: [
+        {
+          label: "Tasso fisso",
+          value: "flat",
+        },
+        {
+          label: "Orario",
+          value: "hour",
+        },
+        {
+          label: "Riga",
+          value: "line",
+        },
+        {
+          label: "Prezzo minimo",
+          value: "min",
+        },
+        {
+          label: "Parola",
+          value: "word",
+        },
+      ],
+      nations: [
+        {
+          label: "Svizzera",
+          value: "CH",
+        },
+        {
+          label: "Germania",
+          value: "DE",
+        },
+      ],
       loading: {
         exchangeRate: false,
         progressNum: false,
-      }
+      },
     };
   },
 
@@ -375,7 +375,7 @@ export default {
           invoice.clientId = value.clientId.id;
         }
 
-        this.$emit('update:modelValue', invoice);
+        this.$emit("update:modelValue", invoice);
       },
     },
   },
@@ -383,7 +383,7 @@ export default {
   methods: {
     async handleClientSearch(term) {
       const clients = await clientApi.list({
-        attributes: ['id', 'name', 'state'],
+        attributes: ["id", "name", "state"],
         limit: 10,
         offset: 0,
         query: term,
@@ -402,7 +402,6 @@ export default {
     },
 
     handleServiceAdd() {
-
       if (false === this.validateService()) {
         return;
       }
@@ -410,7 +409,7 @@ export default {
       if (!this.serviceQuantityEnabled) {
         this.service.quantity = null;
       }
-      
+
       if (this.updateServiceIndex !== null) {
         this.form.services[this.updateServiceIndex] = this.service;
         this.updateServiceIndex = null;
@@ -423,25 +422,23 @@ export default {
     },
 
     validateService() {
-
       this.resetServiceErrors();
       let errors = false;
 
-      if (['hour', 'line'].includes(this.service.type)) {
-
+      if (["hour", "line"].includes(this.service.type)) {
         if (false === gt(this.service.quantity, 0)) {
-          this.errors.serviceQuantity = 'Inserisci una quantità valida';
+          this.errors.serviceQuantity = "Inserisci una quantità valida";
           errors = true;
         }
       }
 
       if (false === gt(this.service.price, 0)) {
-        this.errors.servicePrice = 'Inserisci un prezzo valido';
+        this.errors.servicePrice = "Inserisci un prezzo valido";
         errors = true;
       }
 
-      if (! this.service.name) {
-        this.errors.serviceName = 'Inserisci un nome valido';
+      if (!this.service.name) {
+        this.errors.serviceName = "Inserisci un nome valido";
         errors = true;
       }
 
@@ -449,9 +446,9 @@ export default {
     },
 
     resetServiceErrors() {
-      this.errors.serviceQuantity = '';
-      this.errors.servicePrice = '';
-      this.errors.serviceName = '';
+      this.errors.serviceQuantity = "";
+      this.errors.servicePrice = "";
+      this.errors.serviceName = "";
     },
 
     removeService(index) {
@@ -472,7 +469,7 @@ export default {
     resetServiceForm() {
       this.service = {
         name: null,
-        type: 'flat',
+        type: "flat",
         quantity: null,
         price: null,
       };
@@ -503,16 +500,21 @@ export default {
     },
 
     serviceTypeLabel(value) {
-      return this.serviceTypes.find(type => type.value === value).label;
+      return this.serviceTypes.find((type) => type.value === value).label;
     },
   },
 
   computed: {
     serviceQuantityLabel() {
       switch (this.service.type) {
-        case 'hour': return 'Quantità (ore)';
-        case 'line': return 'Quantità (righe)';
-        default: return 'Quantità';
+        case "hour":
+          return "Quantità (ore)";
+        case "line":
+          return "Quantità (righe)";
+        case "word":
+          return "Quantità (parole)";
+        default:
+          return "Quantità";
       }
     },
 
@@ -521,24 +523,20 @@ export default {
     },
 
     servicePriceLabel() {
-      return this.nationIsCh
-        ? 'Prezzo (chf)'
-        : 'Prezzo (€)';
+      return this.nationIsCh ? "Prezzo (chf)" : "Prezzo (€)";
     },
 
     serviceQuantityEnabled() {
-      return ['line', 'hour'].includes(this.service.type);
+      return ["line", "hour", "word"].includes(this.service.type);
     },
 
     nationIsCh() {
-      return this.form.nation === 'CH';
-    }
+      return this.form.nation === "CH";
+    },
   },
 
   beforeMount() {
-    this.handleClientSearch('');
-  }
-  
-}
-
+    this.handleClientSearch("");
+  },
+};
 </script>
