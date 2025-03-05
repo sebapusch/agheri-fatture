@@ -67,13 +67,17 @@
           </tr>
         </thead>
         <tbody>
-          <% services.forEach(({ name, quantity, price, totalAmount, type }) => { %>
+          <% services.forEach(({ name, quantity, price, totalAmount, type, typeTrans }) => { %>
   
             <tr>
               <td><%= name %></td>
-              <td><%= type %><% if (options.sidenote) { %><span class="highlight">*</span><% } %></td>
+              <td><%= typeTrans %></td>
               <td><%= quantity %></td>
-              <td><%= price %></td>
+              <td><%= price %>
+                <% if (options.sidenote && type == "line") { %>
+                  <span class="highlight">*</span>
+                <% } %>
+              </td>
               <td class="text-right"><%= totalAmount %></td>
             </tr>
   

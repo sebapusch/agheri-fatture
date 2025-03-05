@@ -195,7 +195,8 @@ export default class InvoicePDF {
         quantity: service.quantity ?? "-",
         price: this.currencyPrice(service.price ?? 0),
         priceNum: service.price ?? 0,
-        type: this.serviceTypeTrans(service.type),
+        typeTrans: this.serviceTypeTrans(service.type),
+        type: service.type,
         totalAmount: this.prepareServiceTotalAmount(service),
       }));
     }

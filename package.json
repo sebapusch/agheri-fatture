@@ -1,6 +1,6 @@
 {
   "name": "agheri-fatture",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "description": "A simple Electron application to generate invoices",
   "main": "build/main/main.js",
   "scripts": {
