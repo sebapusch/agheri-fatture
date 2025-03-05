@@ -162,6 +162,23 @@
         </table>
       </div>
     </div>
+
+    <div class="row my-4">
+      <div class="col-12">
+        <div class="form-check">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            id="sidenote"
+            v-model="form.sidenote"
+            :disabled="!hasLineService"
+          />
+          <label class="form-check-label" for="sidenote">
+            Nota Riga
+          </label>
+        </div>
+      </div>
+    </div>
   </div>
 
   <Modal
@@ -375,6 +392,10 @@ export default {
           invoice.clientId = value.clientId.id;
         }
 
+        if (!this.hasLineService) {
+          this.form.sidenote = false;
+        }
+
         this.$emit("update:modelValue", invoice);
       },
     },
@@ -532,6 +553,10 @@ export default {
 
     nationIsCh() {
       return this.form.nation === "CH";
+    },
+
+    hasLineService() {
+      return this.form.services.some(service => service.type === "line");
     },
   },
 

@@ -24,5 +24,6 @@
         }
     },
     "message_de": "Mehrwertsteuer wird nicht berechnet auf Grundlage der italienischen Gesetzgebung, art. 7-ter des Gesetzes DPR 633/72",
-    "message_ch": "Mehrwertsteuer wird nicht berechnet auf Grundlage der italienischen Gesetzgebung, art. 7-ter des Gesetzes DPR 633/72"
+    "message_ch": "Mehrwertsteuer wird nicht berechnet auf Grundlage der italienischen Gesetzgebung, art. 7-ter des Gesetzes DPR 633/72",
+    "sidenote": "*Der Zeilenpreis hat sich geändert, weil er jetzt auf der Basis des deutschen Textes berechnet wird. Da der italienische Text im Mittel 8% länger ist als der deutsche, bleibt der Endpreis im Mittel effektiv gleich"
 }

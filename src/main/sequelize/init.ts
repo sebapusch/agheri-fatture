@@ -40,4 +40,20 @@ export default async function init(sequelize: Sequelize) {
     invoiceId INTEGER NOT NULL,
     FOREIGN KEY (invoiceId) REFERENCES invoices(id)
   )`);
+
+  try {
+    const [results] = await sequelize.query(`
+      PRAGMA table_info(invoices)
+    `);
+
+    const columnExists = results.some((column: any) => column.name === 'sidenote');
+
+    if (!columnExists) {
+      await sequelize.query(`ALTER TABLE invoices ADD COLUMN sidenote INTEGER DEFAULT 0`);
+    }
+  } catch (e) {
+    console.error(e);
+  }
+
+
 }

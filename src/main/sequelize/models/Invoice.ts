@@ -39,6 +39,11 @@ const modelDefiner = function(sequelize) {
         displayEuro: {
             allowNull: true,
             type: DataTypes.BOOLEAN
+        },
+        sidenote: {
+            allowNull: false,
+            type: DataTypes.BOOLEAN,
+            defaultValue: false
         }
     });
 }

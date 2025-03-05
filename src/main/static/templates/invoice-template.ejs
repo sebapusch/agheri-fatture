@@ -71,7 +71,7 @@
   
             <tr>
               <td><%= name %></td>
-              <td><%= type %></td>
+              <td><%= type %><% if (options.sidenote) { %><span class="highlight">*</span><% } %></td>
               <td><%= quantity %></td>
               <td><%= price %></td>
               <td class="text-right"><%= totalAmount %></td>
@@ -94,7 +94,12 @@
     </div>
 
     <div id="message">
+
+      <% if (options.displaySidenote) { %><span class="highlight"><%= options.sidenote %></span><% } %> 
+      <br><br>
       <%= options.message %>
+     
+
     </div>
     
   </body>

@@ -16,6 +16,8 @@ enum Currency {
 type RenderOptions = {
   currency: Currency;
   displayEur: boolean;
+  displaySidenote: boolean;
+  sidenote: string;
   exchangeRate: number;
   billing: Billing;
 };
@@ -134,9 +136,16 @@ export default class InvoicePDF {
       exchangeRate: 0,
       message: "",
       billing: profile.billing,
+      displaySidenote: false,
+      sidenote: "",
     };
 
     let message_key = "message_de";
+
+    if (data.sidenote) {
+      renderOptions.displaySidenote = true;
+      renderOptions.sidenote = application.config.get("sidenote") as string;
+    }
 
     if (data.nation && data.nation === Nations.CH) {
       renderOptions.currency = Currency.CHF;

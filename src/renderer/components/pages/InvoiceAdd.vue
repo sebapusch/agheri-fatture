@@ -79,6 +79,7 @@ export default {
         nation: this.initialInvoice.nation,
         displayEuro: this.initialInvoice.displayEuro,
         exchangeRate: this.initialInvoice.exchangeRate,
+        sidenote: this.initialInvoice.sidenote,
         date: new Date(this.initialInvoice.date),
         services: this.initialInvoice.services.map(
           ({ type, name, quantity, price }) => ({ type, name, quantity, price })
@@ -92,6 +93,7 @@ export default {
         nation: 'DE',
         displayEuro: false,
         exchangeRate: null,
+        sidenote: false,
         date: new Date(),
         services: [],
       };
